@@ -217,8 +217,8 @@ const BT=[
 ];
 /* ===== COMPRAS-FIN ===== */
 function vlook(w,t){/* precio = promedio de banda; interpolamos por el punto medio de cada banda */ const m=t.map((p,i)=>[i<t.length-1?(p[0]+t[i+1][0])/2:p[0]+15,p[1]]); if(w<=m[0][0])return m[0][1]; for(let i=0;i<m.length-1;i++){if(w>=m[i][0]&&w<m[i+1][0])return m[i][1]+(m[i+1][1]-m[i][1])*(w-m[i][0])/(m[i+1][0]-m[i][0]);} return m[m.length-1][1];}
-const PARAMS={aum:0.5,tasa:0.19,plzc:30,plzv:30,base:"Compra + Costos",mortm:0.005,
-  modoCampo:"Alquiler",pctCapt:0.30,sieMet:"Aéreo (voleo)",tcUSD:1446,semPr:0.65,labAv:30,labTe:40,semAv:55,semTe:40,pastImpl:368735,pastDur:4,mant:176900,alqKg:75,alqNov:4179,car:1.0,consMS:0.028,pctsupl:0.40,diasSupl:0,markupSupl:0.05,pMaiz:217761,pSilo:166257,pNucleo:409050,rMaiz:10,rSilo:85,rNucleo:5,msMaiz:87,msSilo:50,msNucleo:97.5,hotel:0,san:7500,comc:0.03,comv:0.03,gui:1725,desb:0,desbv:0,deco:0,
+const PARAMS={aum:0.5,tasa:0.19,plzc:30,plzv:30,base:"Compra + Costos",mortc:0.025,
+  modoCampo:"Alquiler",pctCapt:0.30,sieMet:"Aéreo (voleo)",tcUSD:1446,semPr:0.65,labAv:30,labTe:40,semAv:55,semTe:40,pastImpl:368735,pastDur:4,mant:176900,alqKg:75,alqNov:4179,car:1.0,consMS:0.028,pctsupl:0.40,diasSupl:0,markupSupl:0.05,pMaiz:217761,pSilo:166257,pNucleo:409050,rMaiz:10,rSilo:85,rNucleo:5,msMaiz:87,msSilo:50,msNucleo:97.5,hotel:0,san:7500,comc:0.03,comv:0.03,gui:1725,desb:0,desbv:0.05,deco:0,
   tarifa:3000,cfijo:0,jcomp:12000,jvent:19000,ivavh:0.105,ivach:0.105,ivaf:0.21,ivas:0.21,mni:224000,alic:0.02};
 const NEG={categ:"Machos",modo:"Por días",ent:180,sal:330,dias_in:150,pag:6556,objcab:0,
   dest:"TRANSFERENCIA",fuente:"CACG por kilo",psalin:4800,rinde:0.52,kmi:150,kms:640};
@@ -244,28 +244,28 @@ function calc(N,P){
   const atot=capt?(kgp*P.pctCapt*psal):((campoHa/P.car/365)*dias);
   const stot=capt?0:(pesoProm*consTCpv*P.pctsupl*dsupl*(costoDietaTon/1000)*(1+P.markupSupl)), hot=capt?0:(dias*P.hotel), cp=atot+stot+hot+(capt?0:P.san);
   const cnkg=N.pag*(1+P.desb+P.comc)+flei, cn=cnkg*N.ent;
-  const kgv=salef*(1-P.desbv);
+  const kgv=salef*(1-P.mortc)*(1-P.desbv);
   const gv=N.dest==="TRANSFERENCIA"?0:psal*(P.comv+P.deco)+fles+P.gui/kgv;
   const vnkg=psal-gv, vn=vnkg*kgv;
-  const mort=(N.ent+salef)/2*(P.mortm/30*dias)*((vnkg+cnkg)/2);
-  const res=vn-cn-cp-mort;
+  const mort=salef*P.mortc*vnkg;
+  const res=vn-cn-cp;
   const diasf=Math.max(0,dias-P.plzc+P.plzv), rf=P.tasa/365*diasf;
   const cap=P.base==="Solo compra"?cn:cn+cp, fin=rf*cap, rescf=res-fin;
   const retg=Math.max(0,vn-P.mni)*P.alic;
   const ivadf=psal*kgv*P.ivavh;
   const ivacf=psal*kgv*P.comv*P.ivavh+N.pag*(1+P.comc)*N.ent*P.ivach+(flei*N.ent+fles*salef)*P.ivaf+cp*P.ivas;
   const ivap=ivadf-ivacf;
-  const indif=((vn-cp-mort)/N.ent-flei)/(1+P.desb+P.comc);
-  const Kf=P.base==="Solo compra"?1:(1+rf); const indifcf=(((vn-mort-cp*Kf)/((1+rf)*N.ent))-flei)/(1+P.desb+P.comc);
-  const indifobj=((vn-cp-mort-(N.objcab||0))/N.ent-flei)/(1+P.desb+P.comc);
+  const indif=((vn-cp)/N.ent-flei)/(1+P.desb+P.comc);
+  const Kf=P.base==="Solo compra"?1:(1+rf); const indifcf=(((vn-cp*Kf)/((1+rf)*N.ent))-flei)/(1+P.desb+P.comc);
+  const indifobj=((vn-cp-(N.objcab||0))/N.ent-flei)/(1+P.desb+P.comc);
   const estado=N.pag<=indif?"Buena":"Mala";
   const relrepo=psal>0?N.pag/psal:0;
   const rt=(cn+cp)!==0?res/(cn+cp):0;
   const tea=Math.pow(1+rt,365/dias)-1, ciclos=365/dias;
   const rescom=N.ent*(vnkg-cnkg), resprod=res-rescom;
   const consTCdia=pesoProm*consTCpv*P.pctsupl, totalTC=consTCdia*dsupl;
-  const ventaInd = N.dest==="TRANSFERENCIA" ? (cn+cp+mort)/kgv : (((cn+cp+mort)/kgv)+fles+P.gui/kgv)/(1-P.comv-P.deco);
-  const racionInd = totalTC>0 ? (vn-cn-atot-P.san-mort)/totalTC : 0;
+  const ventaInd = N.dest==="TRANSFERENCIA" ? (cn+cp)/kgv : (((cn+cp)/kgv)+fles+P.gui/kgv)/(1-P.comv-P.deco);
+  const racionInd = totalTC>0 ? (vn-cn-atot-P.san)/totalTC : 0;
   return {dias,salef,kgp,flei,fles,cp,atot,stot,hot,verdImpl,psal,cnkg,cn,kgv,gv,vnkg,vn,mort,res,diasf,rf,fin,rescf,consTCdia,totalTC,ventaInd,racionInd,costoDietaTon,msDieta,
     retg,ivap,indif,indifcf,estado,relrepo,indifobj,rt,tea,ciclos,resanual:res*ciclos,costokg:kgp?cp/kgp:0,rescom,resprod};
 }
@@ -289,7 +289,7 @@ function renderNegocio(){
   if(showFuente) h+=sel("fuente","Fuente precio salida",["CACG por kilo","ROSGAN índice","Manual"],NEG.fuente);
   if(showPsal) h+=inp("psalin","Precio de salida",NEG.dest==="FAENA"?"$/kg carne":"$/kg vivo",NEG.psalin,10);
   if(showRinde) h+=inp("rinde","Rinde","%",NEG.rinde*100,0.5);
-  h+=`<div class="field"><label>↳ Precio venta auto<span class="u">$/kg vivo</span></label><span class="num" id="ventaAuto" style="font-weight:700;color:var(--accent)">—</span></div>`;
+  if(!showPsal) h+=`<div class="field"><label>↳ Precio salida (auto pizarra)<span class="u">$/kg vivo</span></label><span class="num" id="ventaAuto" style="font-weight:700;color:var(--accent)">—</span></div>`;
   c.innerHTML=h;
   c.querySelectorAll("input").forEach(el=>el.addEventListener("input",e=>{
     let k=e.target.dataset.k, val=parseFloat(e.target.value.replace(",","."))||0;
@@ -304,7 +304,7 @@ function sel(k,label,opts,cur){return `<div class="field"><label>${label}</label
 const PDEF=[
   ["FINANCIERO"],["tasa","Tasa anual (TNA) 🔶","%",1,true],["base","Base financiero","",0,false,["Compra + Costos","Solo compra"]],
   ["plzc","Plazo compra","d",1],["plzv","Plazo venta","d",1],
-  ["PRODUCTIVO / CAMPO"],["aum","Aumento diario 🔶","kg/d",0.05],["mortm","Mortandad mensual 🔶","%",0.05,true],["modoCampo","Modo de campo","",0,false,["Alquiler","Capitalización"]],["pctCapt","% Capitalización 🔶","%",1,true],
+  ["PRODUCTIVO / CAMPO"],["aum","Aumento diario 🔶","kg/d",0.05],["mortc","Mortandad por ciclo 🔶","%",0.5,true],["modoCampo","Modo de campo","",0,false,["Alquiler","Capitalización"]],["pctCapt","% Capitalización 🔶","%",1,true],
   ["VERDEOS (siembra)"],["sieMet","Método siembra","",0,false,["Aéreo (voleo)","Terrestre"]],["tcUSD","Tipo de cambio 🔶","$/US",10],["semPr","Precio semilla","us/kg",0.05],["labAv","Labor aéreo","us/ha",1],["semAv","Semilla aéreo","kg/ha",1],["labTe","Labor terrestre","us/ha",1],["semTe","Semilla terrestre","kg/ha",1],
   ["CAMPO (resto por ha)"],["pastImpl","Implem. pasturas 🔶","$/ha",1000],["pastDur","Duración pasturas","años",1],["mant","Mantenimiento 🔶","$/ha año",1000],["alqKg","Alquiler 🔶","kg nov/ha",5],["alqNov","$ novillo alquiler","$/kg",50],["car","Carga 🔶","cab/ha",0.1],["hotel","Hotelería","$/cab día",10],["san","Sanidad 🔶","$/cab",500],
   ["SUPLEMENTACIÓN (dieta 3 insumos)"],["pctsupl","% Suplementación 🔶","%",1,true],["diasSupl","Días de suministro 🔶 (0=todo)","d",1],["markupSupl","Markup transferencia","%",1,true],["consMS","Consumo MS (% PV)","%",0.1,true],["pMaiz","Maíz puesto 🔶","$/ton",1000],["pSilo","Silo 🔶","$/ton",1000],["pNucleo","Núcleo 🔶","$/ton",1000],["rMaiz","Receta maíz","partes",1],["rSilo","Receta silo","partes",1],["rNucleo","Receta núcleo","partes",1],["msMaiz","% MS maíz","%MS",1],["msSilo","% MS silo","%MS",1],["msNucleo","% MS núcleo","%MS",1],
@@ -422,7 +422,7 @@ function renderDetalle(R){
     ${L("Días en engorde",Math.round(R.dias)+" d · "+R.ciclos.toFixed(2)+" ciclos/año")}${L("Aumento diario (ADP)",f1(PARAMS.aum)+" kg/día",1)}${L("Peso de salida efectivo",f1(R.salef)+" kg")}${L("Kg a producir",f1(R.kgp)+" kg")}${L("Consumo ración",f1(R.consTCdia)+" kg/día · "+f0(R.totalTC)+" kg total",1)}
     <tr class="sub"><td colspan="2"><b>COSTOS DE PRODUCCIÓN</b></td></tr>${PARAMS.modoCampo==="Capitalización"?L("Costo capitalización",f0(R.atot)+" ("+(PARAMS.pctCapt*100).toFixed(0)+"% kg × precio)",1):L("Costo de campo (por ha)",f0(R.atot),1)+L("· Implem. verdeos",f0(R.verdImpl)+" $/ha ("+PARAMS.sieMet+")",1)}${L("Suplementación",f0(R.stot),1)}${L("· Costo dieta",f0(R.costoDietaTon)+" $/tnTC · "+R.msDieta.toFixed(1)+"% MS",1)}${L("Hotelería / manejo",f0(R.hot),1)}${L("Sanidad",f0(PARAMS.san),1)}${L("Total costos producción",f0(R.cp))}
     <tr class="sub"><td colspan="2"><b>COMPRA</b></td></tr>${L("Flete ingreso",f1(R.flei)+" $/kg",1)}${L("Compra neta $/kg",f1(R.cnkg))}${L("Compra neta importe",f0p(-R.cn))}
-    <tr class="sub"><td colspan="2"><b>VENTA / SALIDA</b></td></tr>${L("Precio venta bruto",f1(R.psal)+" $/kg vivo",1)}${L("Flete venta",f1(R.fles)+" $/kg",1)}${L("Gastos de venta",f1(R.gv)+" $/kg",1)}${L("Venta neta importe",f0(R.vn))}${L("Mortandad (costo)",f0p(-R.mort),1)}</table>`;
+    <tr class="sub"><td colspan="2"><b>VENTA / SALIDA</b></td></tr>${L("Precio venta bruto",f1(R.psal)+" $/kg vivo",1)}${L("Flete venta",f1(R.fles)+" $/kg",1)}${L("Gastos de venta",f1(R.gv)+" $/kg",1)}${L("Venta neta importe",f0(R.vn))}${L("· Merma mortandad+desbaste (en venta)",f0p(-(R.mort)),1)}</table>`;
   const c2=`<table class="dt"><tr class="sub"><td colspan="2"><b>ANÁLISIS FINANCIERO</b></td></tr>
     ${L("Días financiamiento",Math.round(R.diasf)+" d",1)}${L("Costo financiero",f0p(-R.fin),1)}${L("Capital empleado",f0(R.cn+R.cp),1)}${L("Retorno sobre inversión",fp(R.rt))}${L("TIR anual equivalente",fp(R.tea))}
     <tr class="sub"><td colspan="2"><b>IMPUESTOS</b></td></tr>${L("Retención ganancias",f0(R.retg),1)}${L("IVA posición",f0p(R.ivap),1)}
@@ -502,7 +502,6 @@ function renderComercial(){
 }
 renderNegocio(); renderParams(); renderComercial(); renderAll();
 try{ fetch("precios.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(j=>{ if(!j)return; ["machos","hembras","rosgan","novillo","maiz"].forEach(k=>{ if(j[k]!=null) PIZ[k]=j[k]; }); if(typeof renderAll==="function") renderAll(); }).catch(function(){}); }catch(e){}
-
 </script>
 <script>
 if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){});});}

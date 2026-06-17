@@ -176,7 +176,7 @@ table{border-collapse:collapse;width:100%;font-size:13px}
 <div class="tabs">
   <div class="tab active" data-v="sim">Simulador</div>
   <div class="tab" data-v="det">Detalle del cálculo</div>
-  <div class="tab wip" data-v="bt">Análisis de compras <span class="wip-tag">en revisión</span></div>
+  <div class="tab" data-v="bt">Mis lotes</div>
   <div class="tab wip" data-v="sens">Sensibilidad <span class="wip-tag">en revisión</span></div>
 </div>
 <div class="wrap">
@@ -207,19 +207,17 @@ table{border-collapse:collapse;width:100%;font-size:13px}
   <div class="bd"><div class="dcols" id="detalle"></div></div></div>
 </div>
 <div class="view" id="bt">
-  <div class="wip-banner"><b>Sección en revisión.</b> Funciona, pero usa datos de una feria de prueba y depende de parámetros aún sin validar con Nico. Resultados preliminares.</div>
-  <div class="flag"><b>Análisis de compras del grupo · por feria.</b> Solo lotes con destino invernada comprados por el grupo (Bulltrade, Las Taperas del Oeste, Union Ganadera, Pecuaria Garabi/PEGSA). La indiferencia usa los parámetros actuales — si cambiás la tasa o los costos, esto se actualiza. Se agregan más ferias al cargar sus planillas.</div>
+  <div class="flag"><b>Mis lotes guardados.</b> Cada compra que evaluás y guardás con "Guardar lote" queda acá: lo pagado vs la indiferencia y el veredicto de ese momento. Se guardan en este dispositivo.</div>
   <div class="bsum" id="btsum"></div>
   <div class="filterbar">
-    <span style="font-size:12px;color:var(--muted);font-weight:600">Feria:</span>
-    <select id="feriaSel"></select>
-    <span style="font-size:12px;color:var(--muted);font-weight:600;margin-left:8px">Estado:</span>
+    <span style="font-size:12px;color:var(--muted);font-weight:600">Estado:</span>
     <span class="fbtn active" data-f="all">Todas</span>
     <span class="fbtn" data-f="Buena">Buenas</span>
     <span class="fbtn" data-f="Mala">Malas</span>
+    <button id="clearLotes" onclick="clearLotes()" style="margin-left:auto;border:1px solid var(--line);background:var(--panel);color:var(--muted);font-size:12px;font-weight:600;padding:6px 12px;border-radius:8px;cursor:pointer">Vaciar</button>
   </div>
   <div class="btbl"><table id="bttable"></table></div>
-  <div class="note">Pagado = columna "$VENTA" de la planilla (nuestra compra). Indiferencia con destino transferencia, ~5 meses. Preliminar: depende de los supuestos a validar.</div>
+  <div class="note">Los valores quedan congelados al momento de guardar. Se guardan solo en este dispositivo (este navegador).</div>
 </div>
 <div class="view" id="sens">
   <div class="wip-banner"><b>Sección en revisión.</b> El cálculo anda, pero los techos de compra dependen de la carga y la suplementación todavía sin confirmar. Tomar como orientativo.</div>
@@ -241,25 +239,18 @@ const PIZ={
   rosgan:4900, novillo:4133, maiz:254710
 };
 /* ===== PRECIOS-FIN ===== */
-/* ===== COMPRAS-INICIO (lotes del grupo; se agregan ferias al cargar planillas) ===== */
-const BT=[
- {feria:"Washington",fecha:"10/06/2026",comp:"Bulltrade",ven:"MP Campo",cat:"Machos",cab:24,ent:237,pag:6380},
- {feria:"Washington",fecha:"10/06/2026",comp:"Bulltrade",ven:"MP Campo",cat:"Machos",cab:20,ent:223,pag:6599},
- {feria:"Washington",fecha:"10/06/2026",comp:"Las Taperas",ven:"Pulan Kuru",cat:"Hembras",cab:12,ent:285,pag:5263},
- {feria:"Washington",fecha:"10/06/2026",comp:"Bulltrade",ven:"Peirano",cat:"Machos",cab:10,ent:310,pag:4911},
- {feria:"Washington",fecha:"10/06/2026",comp:"Bulltrade",ven:"Anino",cat:"Machos",cab:12,ent:189,pag:6411},
- {feria:"Washington",fecha:"10/06/2026",comp:"Bulltrade",ven:"Anino",cat:"Machos",cab:12,ent:220,pag:6125},
- {feria:"Washington",fecha:"10/06/2026",comp:"Las Taperas",ven:"Pampa Seeds",cat:"Hembras",cab:1,ent:225,pag:5333},
- {feria:"Washington",fecha:"10/06/2026",comp:"Bulltrade",ven:"Perez Teresita",cat:"Machos",cab:3,ent:207,pag:6194},
- {feria:"Washington",fecha:"10/06/2026",comp:"Las Taperas",ven:"Pulan Kuru",cat:"Hembras",cab:10,ent:291,pag:4914},
- {feria:"Washington",fecha:"10/06/2026",comp:"Bulltrade",ven:"Pampa Seeds",cat:"Machos",cab:4,ent:274,pag:5114},
- {feria:"Washington",fecha:"10/06/2026",comp:"Bulltrade",ven:"Abate Daga",cat:"Machos",cab:6,ent:253,pag:5289},
- {feria:"Washington",fecha:"10/06/2026",comp:"Las Taperas",ven:"Perez Teresita",cat:"Hembras",cab:3,ent:203,pag:5705},
- {feria:"Washington",fecha:"10/06/2026",comp:"Las Taperas",ven:"Bulltrade",cat:"Hembras",cab:1,ent:205,pag:5610},
- {feria:"Washington",fecha:"10/06/2026",comp:"Las Taperas",ven:"Perez Teresita",cat:"Hembras",cab:2,ent:305,pag:4459},
- {feria:"Washington",fecha:"10/06/2026",comp:"Bulltrade",ven:"Perez Teresita",cat:"Machos",cab:3,ent:318,pag:4209}
-];
-/* ===== COMPRAS-FIN ===== */
+/* ===== MIS LOTES (guardados en el dispositivo) ===== */
+function loadLotes(){ try{ return JSON.parse(localStorage.getItem("recriaLotes")||"[]"); }catch(e){ return []; } }
+function persistLotes(a){ try{ localStorage.setItem("recriaLotes",JSON.stringify(a)); }catch(e){} }
+function saveLote(){
+  if(!(NEG.pag>0)){ alert("Cargá el precio pagado antes de guardar el lote."); return; }
+  const R=calc(NEG,PARAMS);
+  const lote={f:new Date().toLocaleDateString("es-AR"),cat:NEG.categ,ent:Math.round(NEG.ent),sal:Math.round(R.salef),dest:NEG.dest,pag:Math.round(NEG.pag),indif:Math.round(R.indif),dif:Math.round(R.indif-NEG.pag),estado:R.estado};
+  const a=loadLotes(); a.unshift(lote); persistLotes(a); renderBacktest();
+  alert("Lote guardado en \"Mis lotes\" ✓");
+}
+function delLote(i){ const a=loadLotes(); a.splice(i,1); persistLotes(a); renderBacktest(); }
+function clearLotes(){ if(confirm("¿Vaciar todos los lotes guardados?")){ persistLotes([]); renderBacktest(); } }
 function bandOf(w,t){let r=t[0];for(const x of t){if(x[0]<=w)r=x;}return r;}
 function vlook(w,t){/* precio = promedio de banda; interpolamos por el punto medio de cada banda */ const m=t.map((p,i)=>[i<t.length-1?(p[0]+t[i+1][0])/2:p[0]+15,p[1]]); if(w<=m[0][0])return m[0][1]; for(let i=0;i<m.length-1;i++){if(w>=m[i][0]&&w<m[i+1][0])return m[i][1]+(m[i+1][1]-m[i][1])*(w-m[i][0])/(m[i+1][0]-m[i][0]);} return m[m.length-1][1];}
 const PARAMS={aum:0.5,tasa:0.19,plzc:30,plzv:30,base:"Compra + Costos",mortc:0.025,
@@ -508,6 +499,7 @@ function renderQuick(){
        <label class="qlb">¿Cuánto te piden? <span style="color:var(--muted);font-weight:400">(opcional)</span></label>
        <div class="qinput"><input id="qpag" class="num" type="number" step="10" placeholder="—" value="${NEG.pag||''}"><span class="qu">$/kg</span></div>
        <div id="qverdict" style="margin-top:9px"></div>
+       <button class="sharebtn" onclick="saveLote()" style="background:var(--accent);margin-top:12px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Guardar lote</button>
      </div>
    </div>`;
   c.querySelectorAll("#qcat .sgb").forEach(b=>b.addEventListener("click",()=>{NEG.categ=b.dataset.cat; c.querySelectorAll("#qcat .sgb").forEach(x=>x.classList.toggle("active",x.dataset.cat===NEG.categ)); updateQuick(); renderAll();}));
@@ -551,6 +543,7 @@ function renderAll(){
         <div class="it"><div class="v num" style="color:${R.indif-NEG.pag>=0?'var(--verde)':'var(--rojo)'}">${f0p(R.indif-NEG.pag)}</div><div class="l">Diferencia</div></div>
       </div>
       ${gaugeSVG(NEG.pag,R.indif)}
+      <button class="sharebtn" onclick="saveLote()" style="background:var(--accent);margin-top:14px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Guardar lote</button>
       <button class="sharebtn" onclick="generateReport()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>Generar informe (PDF)</button>
     </div>`;
   const teaOk=R.tea>=PARAMS.tasa;
@@ -637,28 +630,18 @@ function renderDetalle(R){
 }
 let BTFILTER="all", BTFERIA="all";
 function renderBacktest(){
-  const rows=BT.map(l=>{
-    const N={...NEG,categ:l.cat,modo:"Por días",dias_in:150,ent:l.ent,pag:l.pag,dest:"TRANSFERENCIA"};
-    const R=calc(N,PARAMS); return {...l,indif:R.indif,dif:R.indif-l.pag,estado:R.estado};
-  }).sort((a,b)=>a.dif-b.dif);
-  const fsel=document.getElementById("feriaSel");
-  if(fsel&&fsel.options.length===0){
-    const ferias=["all",...new Set(BT.map(l=>l.feria))];
-    fsel.innerHTML=ferias.map(fr=>`<option value="${fr}">${fr==="all"?"Todas las ferias":fr}</option>`).join("");
-    fsel.addEventListener("change",()=>{BTFERIA=fsel.value;renderBacktest();});
-  }
-  const scope=rows.filter(r=>BTFERIA==="all"||r.feria===BTFERIA);
-  const tot=scope.reduce((s,r)=>s+r.cab,0)||1, cb=scope.filter(r=>r.estado==="Buena").reduce((s,r)=>s+r.cab,0);
-  const nb=scope.filter(r=>r.estado==="Buena").length;
-  document.getElementById("btsum").innerHTML=`
-    <div class="bcard"><div class="v num">${scope.length}</div><div class="l">lotes del grupo</div></div>
-    <div class="bcard"><div class="v num">${tot}</div><div class="l">cabezas</div></div>
-    <div class="bcard"><div class="v num" style="color:var(--verde)">${Math.round(cb/tot*100)}%</div><div class="l">Buenas · ${nb} lotes</div></div>
-    <div class="bcard"><div class="v num" style="color:var(--rojo)">${Math.round((tot-cb)/tot*100)}%</div><div class="l">Malas · ${scope.length-nb} lotes</div></div>`;
-  const filt=scope.filter(r=>BTFILTER==="all"||r.estado===BTFILTER);
-  let h=`<tr><th class="l">Feria</th><th class="l">Comprador</th><th class="l">Vendedor</th><th>Cat</th><th>Cab</th><th>Kg ent</th><th>Pagado</th><th>Indif.</th><th>Dif</th><th>Estado</th></tr>`;
+  const lotes=loadLotes(); const rows=lotes.map((l,i)=>({...l,_i:i}));
+  const nb=rows.filter(r=>r.estado==="Buena").length;
+  document.getElementById("btsum").innerHTML = lotes.length? `
+    <div class="bcard"><div class="v num">${lotes.length}</div><div class="l">lotes guardados</div></div>
+    <div class="bcard"><div class="v num" style="color:var(--verde)">${nb}</div><div class="l">Buenas</div></div>
+    <div class="bcard"><div class="v num" style="color:var(--rojo)">${lotes.length-nb}</div><div class="l">Malas</div></div>
+    <div class="bcard"><div class="v num">${Math.round(nb/lotes.length*100)}%</div><div class="l">% buenas</div></div>` : "";
+  if(lotes.length===0){ document.getElementById("bttable").innerHTML=`<tr><td style="padding:26px;text-align:center;color:var(--muted)">Todavía no guardaste lotes.<br>Evaluá una compra y tocá <b>"Guardar lote"</b>.</td></tr>`; return; }
+  const filt=rows.filter(r=>BTFILTER==="all"||r.estado===BTFILTER);
+  let h=`<tr><th class="l">Fecha</th><th>Cat</th><th>Peso</th><th>Dest</th><th>Pagado</th><th>Indif.</th><th>Dif</th><th>Estado</th><th></th></tr>`;
   for(const r of filt){
-    h+=`<tr><td class="l">${r.feria}</td><td class="l">${r.comp}</td><td class="l">${r.ven}</td><td>${r.cat.slice(0,4)}</td><td>${r.cab}</td><td>${r.ent}</td><td class="num">${f0(r.pag)}</td><td class="num">${f0(r.indif)}</td><td class="num ${r.dif<0?'neg':'pos'}">${f0p(r.dif)}</td><td><span class="pill ${r.estado==='Buena'?'ok':'bad'}">${r.estado}</span></td></tr>`;
+    h+=`<tr><td class="l">${r.f}</td><td>${r.cat.slice(0,4)}</td><td>${r.ent}→${r.sal}</td><td>${(r.dest||"").slice(0,4)}</td><td class="num">${f0(r.pag)}</td><td class="num">${f0(r.indif)}</td><td class="num ${r.dif<0?'neg':'pos'}">${f0p(r.dif)}</td><td><span class="pill ${r.estado==='Buena'?'ok':'bad'}">${r.estado}</span></td><td><button onclick="delLote(${r._i})" style="border:none;background:none;cursor:pointer;color:var(--muted);font-size:16px;line-height:1">×</button></td></tr>`;
   }
   document.getElementById("bttable").innerHTML=h;
 }

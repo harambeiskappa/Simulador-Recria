@@ -84,7 +84,8 @@ La app lee `precios.json` al abrir y actualiza la pizarra y los parámetros de m
 - **Flujo de actualización**: editar archivos → **Commit + Push** (GitHub Desktop) → la app se actualiza sola.
 - **Modo Feria** (rápido: categoría + peso + destino → máximo a pagar, con rango máx/mín de la categoría) y **modo Completo** (simulador completo). El modo Feria refleja el destino y el modo de campo configurados.
 - Botón **Generar informe (PDF)**: arma un informe de una carilla con el estilo de la app y lo comparte como archivo.
-- Pestañas: **Simulador** y **Detalle del cálculo** (listas). **Análisis de compras** y **Sensibilidad** están **en revisión** (dependen de parámetros sin validar / datos de prueba).
+- Botón **Guardar lote**: guarda la evaluación actual (categoría, peso, destino, pagado, indiferencia, veredicto, fecha) en el dispositivo (`localStorage`), con los valores congelados al momento.
+- Pestañas: **Simulador**, **Detalle del cálculo** y **Mis lotes** (historial de lotes guardados en el dispositivo, con filtro buenas/malas y resumen). **Sensibilidad** sigue **en revisión**. (La vieja "Análisis de compras" con datos de prueba se reemplazó por "Mis lotes".)
 
 ---
 
@@ -134,4 +135,4 @@ Validado contra la planilla de Nico:
 
 **Este README se actualiza con cada cambio del simulador** (qué se agrega, saca o modifica). Es la base de contexto para retomar el trabajo y para asistentes de IA (Copilot). Mantenerlo al día es obligatorio.
 
-_Última actualización: 17/06/2026 — modo Feria (con rango máx/mín de Entre Surcos), parámetros básicos/avanzados, informe PDF, pizarra Entre Surcos, cascada por hectárea, dieta de 3 insumos, modos alquiler/capitalización. La pizarra (`precios.json`) ahora guarda por banda [peso, prom, máx, mín]._
+_Última actualización: 17/06/2026 — agregado "Guardar lote" + pestaña "Mis lotes" (registro en el dispositivo) reemplazando la "Análisis de compras" de prueba; selector de destino en modo Feria con rango máx/mín de Entre Surcos; parámetros básicos/avanzados; informe PDF; cascada por hectárea; dieta de 3 insumos; modos alquiler/capitalización. La pizarra (`precios.json`) guarda por banda [peso, prom, máx, mín]._

@@ -77,6 +77,12 @@ details.params>summary{cursor:pointer;list-style:none;background:var(--panel);bo
 details.params>summary::-webkit-details-marker{display:none}
 details.params>summary .ch{transition:.2s;color:var(--muted)}
 details.params[open]>summary .ch{transform:rotate(180deg)}
+.gear{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:12px;font-weight:700;padding:8px 14px;border-radius:20px;cursor:pointer;transition:.15s;white-space:nowrap}
+.gear:hover{background:rgba(255,255,255,.26)}
+.paramsPanel{margin-top:20px;background:var(--ambar-bg);border:1px solid #e7d4a3;border-radius:12px;padding:4px 16px 16px;box-shadow:var(--shadow)}
+.paramsPanel[hidden]{display:none}
+.paramsHd{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--ambar);padding:14px 2px 8px}
+.hd svg{flex:0 0 auto;color:var(--accent)}
 .pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:0 24px;background:var(--panel);border:1px solid var(--line);border-top:none;border-radius:0 0 12px 12px;padding:8px 18px 16px;margin-top:-6px}
 .pgrid .field input,.pgrid .field select{width:120px}
 .pgrid .sechead{grid-column:1/-1;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);padding:12px 0 4px;border-bottom:1px solid var(--line);margin-bottom:2px}
@@ -130,11 +136,11 @@ table{border-collapse:collapse;width:100%;font-size:13px}
 <body>
 <header>
   <div class="brand">
-    <div class="logo">🐂</div>
+    <div class="logo"><svg width="26" height="26" viewBox="0 0 100 100" aria-hidden="true"><text x="50" y="62" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="56" font-weight="700" fill="#fff">R</text><rect x="33" y="71" width="34" height="6" rx="3" fill="#e3b24d"/><circle cx="41" cy="85" r="4" fill="#5fd19a"/><circle cx="59" cy="85" r="4" fill="#e8857c"/></svg></div>
     <div><h1>Simulador de Recría</h1>
       <div class="sub">Darwash SA · Feedlot El Aras · evaluación de compras por indiferencia</div></div>
   </div>
-  <div class="meta">Engorde a campo · v1<br>Pizarra actualizada: <span id="pizFecha">—</span></div>
+  <div style="display:flex;align-items:center;gap:12px"><div class="meta">Engorde a campo · v1<br>Pizarra: <span id="pizFecha">—</span></div><button id="gearBtn" class="gear" aria-label="Abrir parámetros">⚙ Parámetros</button></div>
 </header>
 <div class="tabs">
   <div class="tab active" data-v="sim">Simulador</div>
@@ -146,13 +152,14 @@ table{border-collapse:collapse;width:100%;font-size:13px}
 <div class="view active" id="sim">
   <div class="secttl">1 · Cargá los datos</div>
   <div class="grid2">
-    <div class="card"><div class="hd"><span class="pin"></span>Datos del negocio</div>
+    <div class="card"><div class="hd"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="3" width="8" height="4" rx="1"/><path d="M9 5H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3"/></svg>Datos del negocio</div>
       <div class="bd" id="formNegocio"></div></div>
-    <div class="card"><div class="hd"><span class="pin"></span>Parámetros comerciales</div>
+    <div class="card"><div class="hd"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>Parámetros comerciales</div>
       <div class="bd"><div id="formComercial" style="display:grid;grid-template-columns:1fr 1fr;gap:0 20px"></div></div></div>
   </div>
-  <details class="params"><summary><span>Parámetros base · supuestos avanzados (clic para abrir)</span><span class="ch">▾</span></summary>
-    <div class="pgrid" id="formParams"></div></details>
+  <div id="paramsPanel" class="paramsPanel" hidden>
+    <div class="paramsHd">⚙ Parámetros — editar y revisar</div>
+    <div class="pgrid" id="formParams"></div></div>
   <div class="secttl" style="margin-top:24px">2 · Resultado</div>
   <div class="grid2">
     <div><div id="resultBox"></div><div class="kpis" id="kpis"></div></div>
@@ -161,7 +168,7 @@ table{border-collapse:collapse;width:100%;font-size:13px}
   <div class="hint">Editá los datos y el resultado se recalcula al instante. 🔶 = valor a validar con Nico/Lolo.</div>
 </div>
 <div class="view" id="det">
-  <div class="card"><div class="hd"><span class="pin"></span>Detalle del cálculo · por cabeza</div>
+  <div class="card"><div class="hd"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3.5" y1="6" x2="3.51" y2="6"/><line x1="3.5" y1="12" x2="3.51" y2="12"/><line x1="3.5" y1="18" x2="3.51" y2="18"/></svg>Detalle del cálculo · por cabeza</div>
   <div class="bd"><div class="dcols" id="detalle"></div></div></div>
 </div>
 <div class="view" id="bt">
@@ -483,6 +490,7 @@ document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{
   document.querySelectorAll(".view").forEach(x=>x.classList.remove("active"));
   t.classList.add("active"); document.getElementById(t.dataset.v).classList.add("active");
 }));
+(function(){const g=document.getElementById("gearBtn"),pp=document.getElementById("paramsPanel");if(g&&pp)g.addEventListener("click",()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".view").forEach(x=>x.classList.remove("active"));document.querySelector('.tab[data-v="sim"]').classList.add("active");document.getElementById("sim").classList.add("active");pp.hidden=!pp.hidden;if(!pp.hidden)pp.scrollIntoView({behavior:"smooth",block:"start"});});})();
 document.querySelectorAll(".fbtn").forEach(b=>b.addEventListener("click",()=>{
   document.querySelectorAll(".fbtn").forEach(x=>x.classList.remove("active"));
   b.classList.add("active"); BTFILTER=b.dataset.f; renderBacktest();
@@ -501,14 +509,7 @@ function renderComercial(){
   }));
 }
 renderNegocio(); renderParams(); renderComercial(); renderAll();
-try{ fetch("precios.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(j=>{
-  if(!j)return;
-  ["machos","hembras","rosgan","novillo","maiz"].forEach(k=>{ if(j[k]!=null) PIZ[k]=j[k]; });
-  if(j.tcUSD!=null) PARAMS.tcUSD=j.tcUSD;
-  if(j.novilloArr!=null) PARAMS.alqNov=j.novilloArr;
-  if(typeof renderParams==="function") renderParams();
-  if(typeof renderAll==="function") renderAll();
-}).catch(function(){}); }catch(e){}
+try{ fetch("precios.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(j=>{ if(!j)return; ["machos","hembras","rosgan","novillo","maiz"].forEach(k=>{ if(j[k]!=null) PIZ[k]=j[k]; }); if(j.tcUSD!=null) PARAMS.tcUSD=j.tcUSD; if(j.novilloArr!=null) PARAMS.alqNov=j.novilloArr; if(typeof renderParams==="function") renderParams(); if(typeof renderAll==="function") renderAll(); }).catch(function(){}); }catch(e){}
 </script>
 <script>
 if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){});});}

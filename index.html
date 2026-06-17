@@ -371,14 +371,25 @@ function generateReport(){
   const dest={INVERNADA:'Invernada',FAENA:'Faena',TRANSFERENCIA:'Transferencia'}[NEG.dest]||NEG.dest;
   const fecha=new Date().toLocaleDateString('es-AR');
   const kc=v=>v<0?'#c0392b':'#1f8a4c';
-  const box=(l,v)=>`<div style='background:#f6f4ee;border-radius:10px;padding:10px 13px'><div style='font-size:11px;color:#6a746c'>${l}</div><div style='font-size:15px;font-weight:700;color:#15241c;margin-top:2px'>${v}</div></div>`;
-  const kpi=(l,v,n,c)=>`<div style='background:#fff;border:1px solid #dce2db;border-radius:10px;padding:11px 13px'><div style='font-size:11px;color:#6a746c'>${l}</div><div style='font-size:18px;font-weight:800;color:${c};margin-top:3px'>${v}</div><div style='font-size:10.5px;color:#9aa39a;margin-top:1px'>${n}</div></div>`;
+  const ic=p=>`<svg width='13' height='13' viewBox='0 0 24 24' fill='none' stroke='#b8862f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>${p}</svg>`;
+  const P={tag:"<path d='M9 5H5a2 2 0 0 0-2 2v4l9 9 6-6-9-9z'/><circle cx='7.5' cy='8.5' r='1.2'/>",
+    scale:"<path d='M12 4v16M6 20h12'/><path d='M7 4 4 12h6z'/><path d='M17 4l-3 8h6z'/>",
+    truck:"<path d='M3 7h11v8H3z'/><path d='M14 10h4l3 3v2h-7z'/><circle cx='7' cy='17' r='1.6'/><circle cx='17' cy='17' r='1.6'/>",
+    cal:"<rect x='4' y='5' width='16' height='16' rx='2'/><path d='M16 3v4M8 3v4M4 11h16'/>",
+    trend:"<path d='M3 17l6-6 4 4 8-8'/><path d='M17 7h4v4'/>",
+    cash:"<circle cx='12' cy='12' r='9'/><path d='M12 7v10M9.5 9.5h3.5a1.5 1.5 0 0 1 0 3h-2a1.5 1.5 0 0 0 0 3H14'/>",
+    pct:"<line x1='19' y1='5' x2='5' y2='19'/><circle cx='6.5' cy='6.5' r='2'/><circle cx='17.5' cy='17.5' r='2'/>",
+    swap:"<path d='M7 7h12l-3-3M17 17H5l3 3'/>"};
+  const box=(p,l,v)=>`<div style='background:#f6f4ee;border-radius:10px;padding:10px 13px'><div style='display:flex;align-items:center;gap:6px'>${ic(p)}<span style='font-size:11px;color:#6a746c'>${l}</span></div><div style='font-size:15px;font-weight:700;color:#15241c;margin-top:3px'>${v}</div></div>`;
+  const kpi=(p,l,v,n,c)=>`<div style='background:#fff;border:1px solid #dce2db;border-radius:10px;padding:11px 13px'><div style='display:flex;align-items:center;gap:6px'>${ic(p)}<span style='font-size:11px;color:#6a746c'>${l}</span></div><div style='font-size:18px;font-weight:800;color:${c};margin-top:4px'>${v}</div><div style='font-size:10.5px;color:#9aa39a;margin-top:1px'>${n}</div></div>`;
+  const logo=`<div style='width:42px;height:42px;border-radius:10px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);display:flex;flex-direction:column;align-items:center;justify-content:center'><div style='color:#fff;font-size:23px;font-weight:800;line-height:1'>R</div><div style='width:18px;height:3px;background:#e3b24d;border-radius:2px;margin-top:2px'></div><div style='display:flex;gap:5px;margin-top:3px'><span style='width:4px;height:4px;border-radius:50%;background:#5fd19a'></span><span style='width:4px;height:4px;border-radius:50%;background:#e8857c'></span></div></div>`;
   const sheet=document.createElement('div');
   sheet.style.cssText='position:fixed;left:-99999px;top:0;width:720px;background:#fff;font-family:Inter,Arial,sans-serif';
   sheet.innerHTML=`
-    <div style='background:#13402c;padding:22px 26px;display:flex;justify-content:space-between;align-items:flex-start'>
-      <div><div style='color:#fff;font-size:21px;font-weight:800'>Informe de evaluacion de compra</div>
-      <div style='color:#c8d6cc;font-size:12px;margin-top:3px'>Simulador de Recria \u00b7 Darwash SA \u00b7 Feedlot El Aras</div></div>
+    <div style='background:#13402c;padding:20px 26px;display:flex;justify-content:space-between;align-items:center'>
+      <div style='display:flex;align-items:center;gap:14px'>${logo}
+        <div><div style='color:#fff;font-size:21px;font-weight:800'>Informe de evaluacion de compra</div>
+        <div style='color:#c8d6cc;font-size:12px;margin-top:3px'>Simulador de Recria \u00b7 Darwash SA \u00b7 Feedlot El Aras</div></div></div>
       <div style='color:#fff;font-size:12px'>${fecha}</div></div>
     <div style='height:5px;background:#b8862f'></div>
     <div style='padding:22px 26px'>
@@ -391,17 +402,17 @@ function generateReport(){
           <div><div style='font-size:21px;font-weight:800;color:${kc(dif)}'>${f0p(dif)}</div><div style='font-size:11px;color:#6a746c'>Diferencia $/kg</div></div>
         </div></div>
       <div style='display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px'>
-        ${box('Categoria',NEG.categ)}${box('Peso',Math.round(NEG.ent)+' \u2192 '+Math.round(R.salef)+' kg')}
-        ${box('Destino',dest)}${box('Dias en campo',Math.round(R.dias)+' dias')}
+        ${box(P.tag,'Categoria',NEG.categ)}${box(P.scale,'Peso',Math.round(NEG.ent)+' \u2192 '+Math.round(R.salef)+' kg')}
+        ${box(P.truck,'Destino',dest)}${box(P.cal,'Dias en campo',Math.round(R.dias)+' dias')}
       </div>
       <div style='font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#b8862f;margin:18px 0 8px'>Indicadores</div>
       <div style='display:grid;grid-template-columns:1fr 1fr;gap:10px'>
-        ${kpi('Rentabilidad anual (TEA)',fp(R.tea),'vs tasa '+fp(PARAMS.tasa)+(R.tea>=PARAMS.tasa?' \u00b7 le gana':' \u00b7 no le gana'),kc(R.tea-PARAMS.tasa))}
-        ${kpi('Resultado anual /cab-lugar',f0p(R.resanual),'normaliza el ciclo',kc(R.resanual))}
-        ${kpi('Resultado economico',f0p(R.res),'por cabeza / ciclo',kc(R.res))}
-        ${kpi('Resultado con financiero',f0p(R.rescf),'descontando la tasa',kc(R.rescf))}
-        ${kpi('Costo por kg producido',f0(R.costokg),'que cuesta cada kilo','#15241c')}
-        ${kpi('Relacion de reposicion',R.relrepo.toFixed(2).replace('.',',')+' x','pagado / salida \u00b7 informativo','#15241c')}
+        ${kpi(P.trend,'Rentabilidad anual (TEA)',fp(R.tea),'vs tasa '+fp(PARAMS.tasa)+(R.tea>=PARAMS.tasa?' \u00b7 le gana':' \u00b7 no le gana'),kc(R.tea-PARAMS.tasa))}
+        ${kpi(P.cal,'Resultado anual /cab-lugar',f0p(R.resanual),'normaliza el ciclo',kc(R.resanual))}
+        ${kpi(P.cash,'Resultado economico',f0p(R.res),'por cabeza / ciclo',kc(R.res))}
+        ${kpi(P.pct,'Resultado con financiero',f0p(R.rescf),'descontando la tasa',kc(R.rescf))}
+        ${kpi(P.tag,'Costo por kg producido',f0(R.costokg),'que cuesta cada kilo','#15241c')}
+        ${kpi(P.swap,'Relacion de reposicion',R.relrepo.toFixed(2).replace('.',',')+' x','pagado / salida \u00b7 informativo','#15241c')}
       </div>
       <div style='border-top:1px solid #dce2db;margin-top:18px;padding-top:12px;font-size:11px;color:#6a746c;line-height:1.55'>
         Criterio: precio de compra de indiferencia (punto de equilibrio). Verde = compra conveniente; rojo = por encima de la indiferencia. Algunos parametros son provisorios.<br>Simulador de Recria \u00b7 Darwash SA \u2014 ${fecha}

@@ -14,6 +14,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Recría">
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root{
   --bg:#eef1ed; --panel:#ffffff; --ink:#15241c; --muted:#6a746c; --line:#dce2db;
@@ -59,6 +60,9 @@ header .meta{font-size:11px;color:#bcd2c4;text-align:right}
 .field input:focus,.field select:focus{border-color:var(--green2);box-shadow:0 0 0 3px rgba(31,98,66,.1)}
 .secttl{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin:4px 0 12px}
 .rev{color:var(--ambar);opacity:.5;font-size:.7em;font-weight:700;margin-left:1px;vertical-align:super}
+.sharebtn{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:14px;width:100%;background:var(--green2);color:#fff;border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;transition:.15s}
+.sharebtn:hover{background:var(--green)}
+.sharebtn:active{transform:scale(.99)}
 .hint{font-size:11px;color:var(--muted);font-style:italic;margin-top:8px;line-height:1.45}
 .result{border-radius:14px;padding:22px;text-align:center;border:1.5px solid;transition:.2s;box-shadow:var(--shadow)}
 .result.ok{background:var(--verde-bg);border-color:var(--verde-bd)}
@@ -343,6 +347,64 @@ function renderParams(){
   }));
   c.querySelectorAll("select").forEach(el=>el.addEventListener("change",e=>{PARAMS[e.target.dataset.pk]=e.target.value;renderAll();}));
 }
+function shareResult(){
+  const R=calc(NEG,PARAMS); const buena=NEG.pag<=R.indif; const dif=R.indif-NEG.pag;
+  const dest={INVERNADA:"Invernada",FAENA:"Faena",TRANSFERENCIA:"Transferencia"}[NEG.dest]||NEG.dest;
+  const L=[];
+  L.push("Recría · evaluación de compra");
+  L.push(NEG.categ+" · "+Math.round(NEG.ent)+" → "+Math.round(R.salef)+" kg · "+dest);
+  L.push("Pagado: "+f0(NEG.pag)+" $/kg");
+  L.push("Indiferencia: "+f0(R.indif)+" $/kg");
+  L.push("Diferencia: "+f0p(dif)+" $/kg");
+  L.push(buena?"✓ BUENA COMPRA":"✗ MALA COMPRA → reclamo a la feria");
+  L.push("TEA "+fp(R.tea)+" vs tasa "+fp(PARAMS.tasa));
+  L.push("— Simulador de Recría · Darwash");
+  const txt=L.join("\n");
+  if(navigator.share){ navigator.share({title:"Evaluación de compra",text:txt}).catch(function(){}); }
+  else if(navigator.clipboard){ navigator.clipboard.writeText(txt).then(function(){alert("Resumen copiado al portapapeles");}).catch(function(){alert(txt);}); }
+  else { alert(txt); }
+}
+function generateReport(){
+  if(!(window.jspdf&&window.jspdf.jsPDF)){ alert("El generador está cargando. Probá de nuevo en un instante."); return; }
+  const { jsPDF }=window.jspdf;
+  const R=calc(NEG,PARAMS); const buena=NEG.pag<=R.indif; const dif=R.indif-NEG.pag;
+  const dest={INVERNADA:"Invernada",FAENA:"Faena",TRANSFERENCIA:"Transferencia"}[NEG.dest]||NEG.dest;
+  const fecha=new Date().toLocaleDateString("es-AR");
+  const d=new jsPDF({unit:"pt",format:"a4"}); const W=595;
+  d.setFillColor(19,64,44); d.rect(0,0,W,92,"F");
+  d.setFillColor(184,134,47); d.rect(0,92,W,4,"F");
+  d.setTextColor(255,255,255); d.setFont("helvetica","bold"); d.setFontSize(18);
+  d.text("Informe de evaluacion de compra",40,46);
+  d.setFont("helvetica","normal"); d.setFontSize(10); d.setTextColor(200,214,204);
+  d.text("Simulador de Recria - Darwash SA - Feedlot El Aras",40,66);
+  d.setTextColor(255,255,255); d.setFontSize(10); d.text(fecha,W-40,46,{align:"right"});
+  let y=132;
+  if(buena){ d.setFillColor(231,244,236); d.setDrawColor(191,227,205); } else { d.setFillColor(251,234,232); d.setDrawColor(240,201,196); }
+  d.roundedRect(40,y,W-80,72,8,8,"FD");
+  d.setFont("helvetica","bold"); d.setFontSize(21);
+  if(buena){ d.setTextColor(31,138,76); d.text("VERDE - Buena compra",62,y+35); } else { d.setTextColor(192,57,43); d.text("ROJO - Mala compra",62,y+35); }
+  d.setFont("helvetica","normal"); d.setFontSize(11); d.setTextColor(60,74,64);
+  d.text(buena?"Se pago por debajo del precio de indiferencia.":"Se pago por encima de la indiferencia - corresponde reclamo a la feria.",62,y+56);
+  y+=104;
+  const rows=[["Categoria",NEG.categ],["Peso",Math.round(NEG.ent)+" a "+Math.round(R.salef)+" kg"],["Destino",dest],
+    ["Precio pagado",f0(NEG.pag)+" /kg"],["Precio de indiferencia",f0(R.indif)+" /kg"],["Diferencia",f0p(dif)+" /kg"],
+    ["Rentabilidad (TEA)",fp(R.tea)+"  -  tasa "+fp(PARAMS.tasa)],["Resultado por cabeza",f0p(R.res)]];
+  d.setFontSize(11);
+  rows.forEach((r,i)=>{ const ry=y+i*27;
+    if(i%2===0){ d.setFillColor(246,244,238); d.rect(40,ry-16,W-80,27,"F"); }
+    d.setTextColor(106,116,108); d.setFont("helvetica","normal"); d.text(r[0],56,ry+1);
+    d.setTextColor(21,36,28); d.setFont("helvetica","bold"); d.text(String(r[1]),W-56,ry+1,{align:"right"}); });
+  y+=rows.length*27+26;
+  d.setDrawColor(220,226,219); d.line(40,y,W-40,y); y+=20;
+  d.setFont("helvetica","normal"); d.setFontSize(9.5); d.setTextColor(106,116,108);
+  d.text("Criterio: precio de compra de indiferencia (punto de equilibrio). Verde = compra conveniente;",40,y);
+  d.text("rojo = por encima de la indiferencia. Algunos parametros son estimados (provisorios).",40,y+14);
+  d.setFontSize(9); d.setTextColor(150,158,150);
+  d.text("Simulador de Recria - Darwash SA - "+fecha,40,820);
+  const blob=d.output("blob"); const file=new File([blob],"informe-recria.pdf",{type:"application/pdf"});
+  try{ if(navigator.canShare&&navigator.canShare({files:[file]})){ navigator.share({files:[file],title:"Informe de evaluacion de compra"}).catch(function(){}); return; } }catch(e){}
+  d.save("informe-recria.pdf");
+}
 function renderAll(){
   const R=calc(NEG,PARAMS), ok=R.estado==="Buena";
   if(R.kgp<=0){
@@ -363,6 +425,7 @@ function renderAll(){
         <div class="it"><div class="v num" style="color:${R.indif-NEG.pag>=0?'var(--verde)':'var(--rojo)'}">${f0p(R.indif-NEG.pag)}</div><div class="l">Diferencia</div></div>
       </div>
       ${gaugeSVG(NEG.pag,R.indif)}
+      <button class="sharebtn" onclick="generateReport()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>Generar informe (PDF)</button>
     </div>`;
   const teaOk=R.tea>=PARAMS.tasa;
   document.getElementById("kpis").innerHTML=

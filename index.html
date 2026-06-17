@@ -158,6 +158,7 @@ table{border-collapse:collapse;width:100%;font-size:13px}
 .sgb{flex:1;border:none;background:transparent;color:var(--muted);font-weight:700;font-size:13.5px;padding:9px;border-radius:6px;cursor:pointer}
 .sgb.active{background:var(--green2);color:#fff}
 .prelim{font-size:11.5px;color:#7a4f08;background:var(--ambar-bg);border:1px solid #e7d4a3;border-radius:8px;padding:8px 12px;margin-bottom:14px}
+.field-help{font-size:10.5px;color:var(--muted);line-height:1.4;margin:-2px 0 10px;padding-left:2px}
 .morekpi{margin-top:10px}
 .morekpi>summary{cursor:pointer;list-style:none;font-size:12px;font-weight:700;color:var(--muted);display:flex;align-items:center;gap:6px;padding:8px 2px}
 .morekpi>summary::-webkit-details-marker{display:none}
@@ -342,7 +343,7 @@ function renderNegocio(){
   if(showFuente) h+=sel("fuente","Fuente precio salida",["CACG por kilo","ROSGAN índice","Manual"],NEG.fuente);
   if(showPsal) h+=inp("psalin","Precio de salida",NEG.dest==="FAENA"?"$/kg carne":"$/kg vivo",NEG.psalin,10);
   if(showRinde) h+=inp("rinde","Rinde","%",NEG.rinde*100,0.5);
-  if(!showPsal) h+=`<div class="field"><label>↳ Precio salida (auto pizarra)<span class="u">$/kg vivo</span></label><span class="num" id="ventaAuto" style="font-weight:700;color:var(--accent)">—</span></div>`;
+  if(!showPsal) h+=`<div class="field"><label>↳ Precio de salida estimado<span class="u">$/kg vivo</span></label><span class="num" id="ventaAuto" style="font-weight:700;color:var(--accent)">—</span></div><div class="field-help">Valor del animal al salir, tomado de la pizarra (Entre Surcos) para ese peso. Es la "venta" con la que se compara la compra; baja al engordar.</div>`;
   c.innerHTML=h;
   c.querySelectorAll("input").forEach(el=>el.addEventListener("input",e=>{
     let k=e.target.dataset.k, val=parseFloat(e.target.value.replace(",","."))||0;

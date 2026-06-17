@@ -183,6 +183,7 @@ table{border-collapse:collapse;width:100%;font-size:13px}
   <div class="tab" data-v="det">Detalle del cálculo</div>
   <div class="tab" data-v="bt">Mis lotes</div>
   <div class="tab wip" data-v="sens">Sensibilidad <span class="wip-tag">en revisión</span></div>
+  <div class="tab" data-v="about">Acerca de</div>
 </div>
 <div class="wrap">
 <div class="view active" id="sim">
@@ -233,6 +234,90 @@ table{border-collapse:collapse;width:100%;font-size:13px}
   <div class="card" style="margin-top:16px"><div class="hd"><span class="pin"></span>Indiferencia CON financiero según peso × tasa (TNA)</div>
   <div class="bd"><div class="btbl"><table id="sensB"></table></div>
   <p class="note">Indiferencia incluyendo el costo financiero del ciclo. Baja al subir la tasa. Color = si al precio de mercado de ese peso la compra cierra (verde) o no (rojo).</p></div></div>
+</div>
+<div class="view" id="about">
+  <div class="card" style="margin-bottom:16px">
+    <div class="hd"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>¿Qué es este simulador?</div>
+    <div class="bd" style="font-size:13.5px;line-height:1.7">
+      <p>Herramienta de <b>Darwash SA · Feedlot El Aras</b> para evaluar en el ruedo de la feria si conviene comprar un lote de terneros para recría.</p>
+      <p style="margin-top:10px">Compara el <b>$/kg pagado</b> contra el <b>precio de indiferencia</b> — el precio de compra que hace el resultado por cabeza exactamente igual a cero. Si pagás por debajo de la indiferencia, la compra cierra; si pagás por encima, no.</p>
+      <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+        <div style="flex:1;min-width:160px;background:var(--verde-bg);border:1px solid var(--verde-bd);border-radius:10px;padding:12px 15px">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--verde);margin-bottom:4px">🟢 Verde</div>
+          <div style="font-size:13px">Pagaste <b>por debajo</b> de la indiferencia → buena compra.</div>
+        </div>
+        <div style="flex:1;min-width:160px;background:var(--rojo-bg);border:1px solid var(--rojo-bd);border-radius:10px;padding:12px 15px">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--rojo);margin-bottom:4px">🔴 Rojo</div>
+          <div style="font-size:13px">Pagaste <b>por encima</b> de la indiferencia → mala compra → reclamo a la feria.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="hd"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Modos de uso</div>
+    <div class="bd">
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <div style="flex:1;min-width:200px">
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--accent);margin-bottom:6px">⚡ Modo Feria (rápido)</div>
+          <div style="font-size:13px;line-height:1.65;color:var(--ink)">Pensado para usar <b>en el ruedo, desde el celular</b>. Solo cargás la categoría y el peso del ternero, y el simulador te devuelve el <b>máximo a pagar</b> junto con el rango máx/mín de la pizarra de Entre Surcos. Refleja el destino y el modo de campo configurados.</div>
+        </div>
+        <div style="flex:1;min-width:200px">
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--green2);margin-bottom:6px">🔬 Modo Completo</div>
+          <div style="font-size:13px;line-height:1.65;color:var(--ink)">Simulador completo con control total: días en campo, ganancia diaria, destino, modo de campo (alquiler o capitalización), suplementación, financiero, comercial y más. Muestra la cascada de costos detallada en la pestaña "Detalle del cálculo".</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="hd"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>Modelo de cálculo</div>
+    <div class="bd" style="font-size:13px;line-height:1.7">
+      <p style="margin-bottom:10px">El modelo está alineado a la planilla de cálculo interna (hojas <b>Invernada</b> y <b>Recria Capt</b>) y validado celda por celda. El resultado por cabeza se calcula como:</p>
+      <div style="background:var(--bg);border-radius:9px;padding:12px 15px;font-family:monospace;font-size:12.5px;color:var(--ink);margin-bottom:12px">Resultado = (Venta neta − Compra neta) − Costos de producción [− Costo financiero]</div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px 20px">
+        <div><span style="font-weight:700;color:var(--green2)">Campo por ha</span><br><span style="color:var(--muted);font-size:12px">Verdeos + pasturas + mantenimiento + alquiler ($/kg novillo × precio). Baja a la cabeza según la carga (cab/ha).</span></div>
+        <div><span style="font-weight:700;color:var(--green2)">Suplementación</span><br><span style="color:var(--muted);font-size:12px">Dieta de 3 insumos (maíz, silo, núcleo) ponderada por partes y materia seca.</span></div>
+        <div><span style="font-weight:700;color:var(--green2)">Modos de campo</span><br><span style="color:var(--muted);font-size:12px">Alquiler (cascada completa) o Capitalización (% de los kilos producidos).</span></div>
+        <div><span style="font-weight:700;color:var(--green2)">Destinos</span><br><span style="color:var(--muted);font-size:12px">Invernada (venta viva), Faena (carne × rinde), Transferencia a feedlot propio.</span></div>
+        <div><span style="font-weight:700;color:var(--green2)">Mortandad y desbaste</span><br><span style="color:var(--muted);font-size:12px">Se descuentan de los kilos vendidos, no como costo aparte.</span></div>
+        <div><span style="font-weight:700;color:var(--green2)">Comercial / financiero</span><br><span style="color:var(--muted);font-size:12px">Comisiones, guías, fletes, IVA, retención de ganancias (RG 830), costo financiero.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="hd"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>Pizarra de precios</div>
+    <div class="bd" style="font-size:13px;line-height:1.7">
+      <p style="margin-bottom:10px">La app lee <code style="background:var(--bg);border-radius:5px;padding:1px 6px;font-size:12px">precios.json</code> al abrir y actualiza la pizarra y los parámetros de mercado automáticamente.</p>
+      <table style="font-size:12.5px">
+        <thead><tr style="background:#f7f9f6"><th style="padding:7px 10px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);border-bottom:1px solid var(--line)">Dato</th><th style="padding:7px 10px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);border-bottom:1px solid var(--line)">Fuente</th><th style="padding:7px 10px;text-align:center;font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);border-bottom:1px solid var(--line)">Auto</th></tr></thead>
+        <tbody>
+          <tr><td style="padding:7px 10px;border-bottom:1px solid #eef2ee">Terneros / terneras / vaquillonas</td><td style="padding:7px 10px;border-bottom:1px solid #eef2ee;color:var(--muted)">Entre Surcos y Corrales</td><td style="padding:7px 10px;border-bottom:1px solid #eef2ee;text-align:center">✅ semanal</td></tr>
+          <tr><td style="padding:7px 10px;border-bottom:1px solid #eef2ee">Maíz</td><td style="padding:7px 10px;border-bottom:1px solid #eef2ee;color:var(--muted)">BCR Rosario</td><td style="padding:7px 10px;border-bottom:1px solid #eef2ee;text-align:center">✅ semanal</td></tr>
+          <tr><td style="padding:7px 10px;border-bottom:1px solid #eef2ee">Novillo gordo / arrendamiento</td><td style="padding:7px 10px;border-bottom:1px solid #eef2ee;color:var(--muted)">MA Cañuelas</td><td style="padding:7px 10px;border-bottom:1px solid #eef2ee;text-align:center">✅ semanal</td></tr>
+          <tr><td style="padding:7px 10px;border-bottom:1px solid #eef2ee">Tipo de cambio</td><td style="padding:7px 10px;border-bottom:1px solid #eef2ee;color:var(--muted)">Dólar mayorista</td><td style="padding:7px 10px;border-bottom:1px solid #eef2ee;text-align:center">✅ semanal</td></tr>
+          <tr><td style="padding:7px 10px">Silo / núcleo / semilla</td><td style="padding:7px 10px;color:var(--muted)">Proveedor</td><td style="padding:7px 10px;text-align:center;color:var(--muted)">✏️ manual</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="hd"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z"/><path d="M12 6v6l4 2"/></svg>Funciones principales</div>
+    <div class="bd" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px 20px;font-size:13px">
+      <div><span style="font-weight:700">📋 Detalle del cálculo</span><br><span style="color:var(--muted);font-size:12px">Cascada completa de costos, ingresos y resultado, desglosada por cabeza.</span></div>
+      <div><span style="font-weight:700">🗂 Mis lotes</span><br><span style="color:var(--muted);font-size:12px">Registro de evaluaciones guardadas en el dispositivo (localStorage), con filtro buenas/malas y resumen.</span></div>
+      <div><span style="font-weight:700">📄 Informe PDF</span><br><span style="color:var(--muted);font-size:12px">Genera un informe de una carilla con el estilo de la app, listo para compartir.</span></div>
+      <div><span style="font-weight:700">📡 Pizarra en vivo</span><br><span style="color:var(--muted);font-size:12px">Precios de mercado actualizados automáticamente al abrir la app.</span></div>
+      <div><span style="font-weight:700">📲 App instalable (PWA)</span><br><span style="color:var(--muted);font-size:12px">Instalable en iPhone/Android como app nativa. Funciona offline; se actualiza sola al reabrir.</span></div>
+      <div><span style="font-weight:700">⚙️ Parámetros básicos y avanzados</span><br><span style="color:var(--muted);font-size:12px">Parámetros simples a la vista y avanzados plegados: financiero, siembra, dieta, comercial, flete, impuestos.</span></div>
+    </div>
+  </div>
+
+  <div class="note" style="text-align:center;padding:8px 0">
+    <b>Darwash SA · Feedlot El Aras</b> · <a href="https://harambeiskappa.github.io/Simulador-Recria/" style="color:var(--green2);text-decoration:none">harambeiskappa.github.io/Simulador-Recria</a>
+  </div>
 </div>
 </div>
 <script>

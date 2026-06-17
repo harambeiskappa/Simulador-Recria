@@ -501,7 +501,14 @@ function renderComercial(){
   }));
 }
 renderNegocio(); renderParams(); renderComercial(); renderAll();
-try{ fetch("precios.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(j=>{ if(!j)return; ["machos","hembras","rosgan","novillo","maiz"].forEach(k=>{ if(j[k]!=null) PIZ[k]=j[k]; }); if(typeof renderAll==="function") renderAll(); }).catch(function(){}); }catch(e){}
+try{ fetch("precios.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(j=>{
+  if(!j)return;
+  ["machos","hembras","rosgan","novillo","maiz"].forEach(k=>{ if(j[k]!=null) PIZ[k]=j[k]; });
+  if(j.tcUSD!=null) PARAMS.tcUSD=j.tcUSD;
+  if(j.novilloArr!=null) PARAMS.alqNov=j.novilloArr;
+  if(typeof renderParams==="function") renderParams();
+  if(typeof renderAll==="function") renderAll();
+}).catch(function(){}); }catch(e){}
 </script>
 <script>
 if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){});});}

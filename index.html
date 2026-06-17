@@ -58,6 +58,7 @@ header .meta{font-size:11px;color:#bcd2c4;text-align:right}
 .field select{text-align:left;color:var(--ink)}
 .field input:focus,.field select:focus{border-color:var(--green2);box-shadow:0 0 0 3px rgba(31,98,66,.1)}
 .secttl{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin:4px 0 12px}
+.rev{color:var(--ambar);opacity:.5;font-size:.7em;font-weight:700;margin-left:1px;vertical-align:super}
 .hint{font-size:11px;color:var(--muted);font-style:italic;margin-top:8px;line-height:1.45}
 .result{border-radius:14px;padding:22px;text-align:center;border:1.5px solid;transition:.2s;box-shadow:var(--shadow)}
 .result.ok{background:var(--verde-bg);border-color:var(--verde-bd)}
@@ -170,7 +171,7 @@ table{border-collapse:collapse;width:100%;font-size:13px}
     <div><div id="resultBox"></div><div class="kpis" id="kpis"></div></div>
     <div id="pizPanel"></div>
   </div>
-  <div class="hint">Editá los datos y el resultado se recalcula al instante. 🔶 = valor a validar con Nico/Lolo.</div>
+  <div class="hint">Editá los datos y el resultado se recalcula al instante. <sup class='rev'>*</sup> algunos datos son estimados.</div>
 </div>
 <div class="view" id="det">
   <div class="card"><div class="hd"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3.5" y1="6" x2="3.51" y2="6"/><line x1="3.5" y1="12" x2="3.51" y2="12"/><line x1="3.5" y1="18" x2="3.51" y2="18"/></svg>Detalle del cálculo · por cabeza</div>
@@ -316,12 +317,12 @@ function renderNegocio(){
 function inp(k,label,u,val,step){return `<div class="field"><label>${label}<span class="u">${u}</span></label><input class="num" type="number" step="${step}" data-k="${k}" value="${val}"></div>`;}
 function sel(k,label,opts,cur){return `<div class="field"><label>${label}</label><select data-k="${k}">${opts.map(o=>`<option ${o===cur?"selected":""}>${o}</option>`).join("")}</select></div>`;}
 const PDEF=[
-  ["FINANCIERO"],["tasa","Tasa anual (TNA) 🔶","%",1,true],["base","Base financiero","",0,false,["Compra + Costos","Solo compra"]],
+  ["FINANCIERO"],["tasa","Tasa anual (TNA)<sup class='rev'>*</sup>","%",1,true],["base","Base financiero","",0,false,["Compra + Costos","Solo compra"]],
   ["plzc","Plazo compra","d",1],["plzv","Plazo venta","d",1],
-  ["PRODUCTIVO / CAMPO"],["aum","Aumento diario 🔶","kg/d",0.05],["mortc","Mortandad por ciclo 🔶","%",0.5,true],["modoCampo","Modo de campo","",0,false,["Alquiler","Capitalización"]],["pctCapt","% Capitalización 🔶","%",1,true],
-  ["VERDEOS (siembra)"],["sieMet","Método siembra","",0,false,["Aéreo (voleo)","Terrestre"]],["tcUSD","Tipo de cambio 🔶","$/US",10],["semPr","Precio semilla","us/kg",0.05],["labAv","Labor aéreo","us/ha",1],["semAv","Semilla aéreo","kg/ha",1],["labTe","Labor terrestre","us/ha",1],["semTe","Semilla terrestre","kg/ha",1],
-  ["CAMPO (resto por ha)"],["pastImpl","Implem. pasturas 🔶","$/ha",1000],["pastDur","Duración pasturas","años",1],["mant","Mantenimiento 🔶","$/ha año",1000],["alqKg","Alquiler 🔶","kg nov/ha",5],["alqNov","$ novillo alquiler","$/kg",50],["car","Carga 🔶","cab/ha",0.1],["hotel","Hotelería","$/cab día",10],["san","Sanidad 🔶","$/cab",500],
-  ["SUPLEMENTACIÓN (dieta 3 insumos)"],["pctsupl","% Suplementación 🔶","%",1,true],["diasSupl","Días de suministro 🔶 (0=todo)","d",1],["markupSupl","Markup transferencia","%",1,true],["consMS","Consumo MS (% PV)","%",0.1,true],["pMaiz","Maíz puesto 🔶","$/ton",1000],["pSilo","Silo 🔶","$/ton",1000],["pNucleo","Núcleo 🔶","$/ton",1000],["rMaiz","Receta maíz","partes",1],["rSilo","Receta silo","partes",1],["rNucleo","Receta núcleo","partes",1],["msMaiz","% MS maíz","%MS",1],["msSilo","% MS silo","%MS",1],["msNucleo","% MS núcleo","%MS",1],
+  ["PRODUCTIVO / CAMPO"],["aum","Aumento diario<sup class='rev'>*</sup>","kg/d",0.05],["mortc","Mortandad por ciclo<sup class='rev'>*</sup>","%",0.5,true],["modoCampo","Modo de campo","",0,false,["Alquiler","Capitalización"]],["pctCapt","% Capitalización<sup class='rev'>*</sup>","%",1,true],
+  ["VERDEOS (siembra)"],["sieMet","Método siembra","",0,false,["Aéreo (voleo)","Terrestre"]],["tcUSD","Tipo de cambio<sup class='rev'>*</sup>","$/US",10],["semPr","Precio semilla","us/kg",0.05],["labAv","Labor aéreo","us/ha",1],["semAv","Semilla aéreo","kg/ha",1],["labTe","Labor terrestre","us/ha",1],["semTe","Semilla terrestre","kg/ha",1],
+  ["CAMPO (resto por ha)"],["pastImpl","Implem. pasturas<sup class='rev'>*</sup>","$/ha",1000],["pastDur","Duración pasturas","años",1],["mant","Mantenimiento<sup class='rev'>*</sup>","$/ha año",1000],["alqKg","Alquiler<sup class='rev'>*</sup>","kg nov/ha",5],["alqNov","$ novillo alquiler","$/kg",50],["car","Carga<sup class='rev'>*</sup>","cab/ha",0.1],["hotel","Hotelería","$/cab día",10],["san","Sanidad<sup class='rev'>*</sup>","$/cab",500],
+  ["SUPLEMENTACIÓN (dieta 3 insumos)"],["pctsupl","% Suplementación<sup class='rev'>*</sup>","%",1,true],["diasSupl","Días de suministro<sup class='rev'>*</sup> (0=todo)","d",1],["markupSupl","Markup transferencia","%",1,true],["consMS","Consumo MS (% PV)","%",0.1,true],["pMaiz","Maíz puesto<sup class='rev'>*</sup>","$/ton",1000],["pSilo","Silo<sup class='rev'>*</sup>","$/ton",1000],["pNucleo","Núcleo<sup class='rev'>*</sup>","$/ton",1000],["rMaiz","Receta maíz","partes",1],["rSilo","Receta silo","partes",1],["rNucleo","Receta núcleo","partes",1],["msMaiz","% MS maíz","%MS",1],["msSilo","% MS silo","%MS",1],["msNucleo","% MS núcleo","%MS",1],
   ["COMERCIAL (finos)"],["desb","Desbaste compra","%",0.5,true],["desbv","Desbaste venta","%",0.5,true],["deco","Decomiso","%",0.1,true],
   ["FLETE (finos)"],["cfijo","Cargo fijo","$",1000],["jcomp","Jaula compra","kg",500],["jvent","Jaula venta","kg",500],
   ["IMPUESTOS"],["ivavh","IVA venta hac.","%",0.5,true],["ivach","IVA compra hac.","%",0.5,true],["ivaf","IVA fletes","%",1,true],["ivas","IVA servicios","%",1,true],["mni","MNI ret. gcias","$",1000],["alic","Alícuota ret.","%",0.5,true]
@@ -506,7 +507,7 @@ document.getElementById("pizFecha").textContent=PIZ_FECHA;
 function renderComercial(){
   const c=document.getElementById("formComercial");
   const F=[["N","kmi","Km de ingreso","km",NEG.kmi,0],["N","kms","Km de salida","km",NEG.kms,0],
-    ["P","tarifa","Precio flete 🔶","$/km",PARAMS.tarifa,0],["P","gui","Guías","$/cab",PARAMS.gui,0],
+    ["P","tarifa","Precio flete<sup class='rev'>*</sup>","$/km",PARAMS.tarifa,0],["P","gui","Guías","$/cab",PARAMS.gui,0],
     ["P","comc","Comisión compra","%",+(PARAMS.comc*100).toFixed(2),1],["P","comv","Comisión venta","%",+(PARAMS.comv*100).toFixed(2),1]];
   c.innerHTML=F.map(([o,k,l,u,v,p])=>`<div class="field"><label>${l}<span class="u">${u}</span></label><input class="num" type="number" data-o="${o}" data-k="${k}" data-p="${p}" value="${v}"></div>`).join("");
   c.querySelectorAll("input").forEach(el=>el.addEventListener("input",e=>{

@@ -93,6 +93,12 @@ details.params[open]>summary .ch{transform:rotate(180deg)}
 .paramsPanel{margin-top:20px;background:var(--ambar-bg);border:1px solid #e7d4a3;border-radius:12px;padding:4px 16px 16px;box-shadow:var(--shadow)}
 .paramsPanel[hidden]{display:none}
 .paramsHd{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--ambar);padding:14px 2px 8px}
+.advparams{margin-top:14px;border-top:1px dashed var(--line)}
+.advparams>summary{cursor:pointer;list-style:none;font-size:12px;font-weight:700;color:var(--muted);display:flex;align-items:center;justify-content:space-between;padding:11px 2px}
+.advparams>summary::-webkit-details-marker{display:none}
+.advparams>summary .ch{transition:.2s}
+.advparams[open]>summary .ch{transform:rotate(180deg)}
+.advparams .pgrid{margin-top:6px}
 .hd svg{flex:0 0 auto;color:var(--accent)}
 .pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:0 24px;background:var(--panel);border:1px solid var(--line);border-top:none;border-radius:0 0 12px 12px;padding:8px 18px 16px;margin-top:-6px}
 .pgrid .field input,.pgrid .field select{width:120px}
@@ -170,7 +176,7 @@ table{border-collapse:collapse;width:100%;font-size:13px}
   </div>
   <div id="paramsPanel" class="paramsPanel" hidden>
     <div class="paramsHd">⚙ Parámetros — editar y revisar</div>
-    <div class="pgrid" id="formParams"></div></div>
+    <div id="formParams"></div></div>
   <div class="secttl" style="margin-top:24px">2 · Resultado</div>
   <div class="grid2">
     <div><div id="resultBox"></div><div class="kpis" id="kpis"></div></div>
@@ -321,27 +327,53 @@ function renderNegocio(){
 }
 function inp(k,label,u,val,step){return `<div class="field"><label>${label}<span class="u">${u}</span></label><input class="num" type="number" step="${step}" data-k="${k}" value="${val}"></div>`;}
 function sel(k,label,opts,cur){return `<div class="field"><label>${label}</label><select data-k="${k}">${opts.map(o=>`<option ${o===cur?"selected":""}>${o}</option>`).join("")}</select></div>`;}
-const PDEF=[
-  ["FINANCIERO"],["tasa","Tasa anual (TNA)<sup class='rev'>*</sup>","%",1,true],["base","Base financiero","",0,false,["Compra + Costos","Solo compra"]],
+const PBASIC=[
+  ["NEGOCIO Y CAMPO"],
+  ["modoCampo","Modo de campo","",0,false,["Alquiler","Capitalización"]],
+  ["pctCapt","% Capitalización<sup class='rev'>*</sup>","%",1,true],
+  ["car","Carga de terneros<sup class='rev'>*</sup>","cab/ha",0.1],
+  ["alqKg","Alquiler<sup class='rev'>*</sup>","kg nov/ha",5],
+  ["alqNov","$ novillo alquiler<sup class='rev'>*</sup>","$/kg",50],
+  ["aum","Aumento diario<sup class='rev'>*</sup>","kg/d",0.05],
+  ["mortc","Mortandad por ciclo<sup class='rev'>*</sup>","%",0.5,true],
+  ["san","Sanidad<sup class='rev'>*</sup>","$/cab",500],
+  ["tasa","Tasa anual (TNA)<sup class='rev'>*</sup>","%",1,true],
+  ["SUPLEMENTACIÓN"],
+  ["sieMet","Siembra verdeo","",0,false,["Aéreo (voleo)","Terrestre"]],
+  ["pctsupl","% Suplementación<sup class='rev'>*</sup>","%",1,true],
+  ["diasSupl","Días de suministro<sup class='rev'>*</sup> (0=todo)","d",1],
+  ["pMaiz","Maíz puesto<sup class='rev'>*</sup>","$/ton",1000],
+  ["pSilo","Silo<sup class='rev'>*</sup>","$/ton",1000],
+  ["pNucleo","Núcleo<sup class='rev'>*</sup>","$/ton",1000]
+];
+const PADV=[
+  ["FINANCIERO (finos)"],
+  ["base","Base financiero","",0,false,["Compra + Costos","Solo compra"]],
   ["plzc","Plazo compra","d",1],["plzv","Plazo venta","d",1],
-  ["PRODUCTIVO / CAMPO"],["aum","Aumento diario<sup class='rev'>*</sup>","kg/d",0.05],["mortc","Mortandad por ciclo<sup class='rev'>*</sup>","%",0.5,true],["modoCampo","Modo de campo","",0,false,["Alquiler","Capitalización"]],["pctCapt","% Capitalización<sup class='rev'>*</sup>","%",1,true],
-  ["VERDEOS (siembra)"],["sieMet","Método siembra","",0,false,["Aéreo (voleo)","Terrestre"]],["tcUSD","Tipo de cambio<sup class='rev'>*</sup>","$/US",10],["semPr","Precio semilla","us/kg",0.05],["labAv","Labor aéreo","us/ha",1],["semAv","Semilla aéreo","kg/ha",1],["labTe","Labor terrestre","us/ha",1],["semTe","Semilla terrestre","kg/ha",1],
-  ["CAMPO (resto por ha)"],["pastImpl","Implem. pasturas<sup class='rev'>*</sup>","$/ha",1000],["pastDur","Duración pasturas","años",1],["mant","Mantenimiento<sup class='rev'>*</sup>","$/ha año",1000],["alqKg","Alquiler<sup class='rev'>*</sup>","kg nov/ha",5],["alqNov","$ novillo alquiler","$/kg",50],["car","Carga de terneros<sup class='rev'>*</sup>","cab/ha",0.1],["hotel","Hotelería","$/cab día",10],["san","Sanidad<sup class='rev'>*</sup>","$/cab",500],
-  ["SUPLEMENTACIÓN (dieta 3 insumos)"],["pctsupl","% Suplementación<sup class='rev'>*</sup>","%",1,true],["diasSupl","Días de suministro<sup class='rev'>*</sup> (0=todo)","d",1],["markupSupl","Markup transferencia","%",1,true],["consMS","Consumo MS (% PV)","%",0.1,true],["pMaiz","Maíz puesto<sup class='rev'>*</sup>","$/ton",1000],["pSilo","Silo<sup class='rev'>*</sup>","$/ton",1000],["pNucleo","Núcleo<sup class='rev'>*</sup>","$/ton",1000],["rMaiz","Receta maíz","partes",1],["rSilo","Receta silo","partes",1],["rNucleo","Receta núcleo","partes",1],["msMaiz","% MS maíz","%MS",1],["msSilo","% MS silo","%MS",1],["msNucleo","% MS núcleo","%MS",1],
+  ["VERDEOS (técnico)"],
+  ["tcUSD","Tipo de cambio<sup class='rev'>*</sup>","$/US",10],["semPr","Precio semilla","us/kg",0.05],
+  ["labAv","Labor aéreo","us/ha",1],["semAv","Semilla aéreo","kg/ha",1],["labTe","Labor terrestre","us/ha",1],["semTe","Semilla terrestre","kg/ha",1],
+  ["CAMPO (técnico)"],
+  ["pastImpl","Implem. pasturas<sup class='rev'>*</sup>","$/ha",1000],["pastDur","Duración pasturas","años",1],["mant","Mantenimiento<sup class='rev'>*</sup>","$/ha año",1000],["hotel","Hotelería","$/cab día",10],
+  ["DIETA (receta y materia seca)"],
+  ["consMS","Consumo MS (% PV)","%",0.1,true],["markupSupl","Markup transferencia","%",1,true],
+  ["rMaiz","Receta maíz","partes",1],["rSilo","Receta silo","partes",1],["rNucleo","Receta núcleo","partes",1],
+  ["msMaiz","% MS maíz","%MS",1],["msSilo","% MS silo","%MS",1],["msNucleo","% MS núcleo","%MS",1],
   ["COMERCIAL (finos)"],["desb","Desbaste compra","%",0.5,true],["desbv","Desbaste venta","%",0.5,true],["deco","Decomiso","%",0.1,true],
   ["FLETE (finos)"],["cfijo","Cargo fijo","$",1000],["jcomp","Jaula compra","kg",500],["jvent","Jaula venta","kg",500],
   ["IMPUESTOS"],["ivavh","IVA venta hac.","%",0.5,true],["ivach","IVA compra hac.","%",0.5,true],["ivaf","IVA fletes","%",1,true],["ivas","IVA servicios","%",1,true],["mni","MNI ret. gcias","$",1000],["alic","Alícuota ret.","%",0.5,true]
 ];
+function pfield(d){
+  if(d.length===1) return `<div class="sechead">${d[0]}</div>`;
+  const[k,label,u,step,isPct,opts]=d;
+  if(opts) return `<div class="field"><label>${label}</label><select data-pk="${k}">${opts.map(o=>`<option ${o===PARAMS[k]?"selected":""}>${o}</option>`).join("")}</select></div>`;
+  const val=isPct?+(PARAMS[k]*100).toFixed(2):PARAMS[k];
+  return `<div class="field"><label>${label}<span class="u">${u}</span></label><input class="num" type="number" step="${step}" data-pk="${k}" data-pct="${isPct?1:0}" value="${val}"></div>`;
+}
 function renderParams(){
-  const c=document.getElementById("formParams"); let h="";
-  for(const d of PDEF){
-    if(d.length===1){h+=`<div class="sechead">${d[0]}</div>`;continue;}
-    const[k,label,u,step,isPct,opts]=d;
-    if(opts){h+=`<div class="field"><label>${label}</label><select data-pk="${k}">${opts.map(o=>`<option ${o===PARAMS[k]?"selected":""}>${o}</option>`).join("")}</select></div>`;}
-    else{const val=isPct?+(PARAMS[k]*100).toFixed(2):PARAMS[k];
-      h+=`<div class="field"><label>${label}<span class="u">${u}</span></label><input class="num" type="number" step="${step}" data-pk="${k}" data-pct="${isPct?1:0}" value="${val}"></div>`;}
-  }
-  c.innerHTML=h;
+  const c=document.getElementById("formParams");
+  c.innerHTML=`<div class="pgrid">${PBASIC.map(pfield).join("")}</div>`+
+    `<details class="advparams"><summary><span>Mostrar parámetros avanzados (finos)</span><span class="ch">▾</span></summary><div class="pgrid">${PADV.map(pfield).join("")}</div></details>`;
   c.querySelectorAll("input").forEach(el=>el.addEventListener("input",e=>{
     let k=e.target.dataset.pk, v=parseFloat(e.target.value.replace(",","."))||0;
     PARAMS[k]=e.target.dataset.pct==="1"?v/100:v; renderAll();

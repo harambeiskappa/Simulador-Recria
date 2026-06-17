@@ -157,6 +157,7 @@ table{border-collapse:collapse;width:100%;font-size:13px}
 .seg{display:flex;gap:4px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:3px}
 .sgb{flex:1;border:none;background:transparent;color:var(--muted);font-weight:700;font-size:13.5px;padding:9px;border-radius:6px;cursor:pointer}
 .sgb.active{background:var(--green2);color:#fff}
+.prelim{font-size:11.5px;color:#7a4f08;background:var(--ambar-bg);border:1px solid #e7d4a3;border-radius:8px;padding:8px 12px;margin-bottom:14px}
 .morekpi{margin-top:10px}
 .morekpi>summary{cursor:pointer;list-style:none;font-size:12px;font-weight:700;color:var(--muted);display:flex;align-items:center;gap:6px;padding:8px 2px}
 .morekpi>summary::-webkit-details-marker{display:none}
@@ -182,11 +183,12 @@ table{border-collapse:collapse;width:100%;font-size:13px}
   <div class="tab active" data-v="sim">Simulador</div>
   <div class="tab" data-v="det">Detalle del cálculo</div>
   <div class="tab" data-v="bt">Mis lotes</div>
-  <div class="tab wip" data-v="sens">Sensibilidad <span class="wip-tag">en revisión</span></div>
+  <div class="tab" data-v="sens">Sensibilidad</div>
 </div>
 <div class="wrap">
 <div class="view active" id="sim">
   <div class="modetoggle"><button class="mt active" data-m="rapido">⚡ Feria</button><button class="mt" data-m="completo">Completo</button></div>
+  <div class="prelim">Resultados preliminares — faltan validar la carga y la suplementación con Nico.</div>
   <div id="quickPanel"></div>
   <div id="fullPanel" hidden>
   <div class="secttl">1 · Cargá los datos</div>
@@ -219,15 +221,18 @@ table{border-collapse:collapse;width:100%;font-size:13px}
     <span class="fbtn active" data-f="all">Todas</span>
     <span class="fbtn" data-f="Buena">Buenas</span>
     <span class="fbtn" data-f="Mala">Malas</span>
-    <button id="clearLotes" onclick="clearLotes()" style="margin-left:auto;border:1px solid var(--line);background:var(--panel);color:var(--muted);font-size:12px;font-weight:600;padding:6px 12px;border-radius:8px;cursor:pointer">Vaciar</button>
+    <button onclick="exportLotes()" style="margin-left:auto;border:1px solid var(--line);background:var(--panel);color:var(--green2);font-size:12px;font-weight:600;padding:6px 12px;border-radius:8px;cursor:pointer">Exportar CSV</button>
+    <button id="clearLotes" onclick="clearLotes()" style="margin-left:8px;border:1px solid var(--line);background:var(--panel);color:var(--muted);font-size:12px;font-weight:600;padding:6px 12px;border-radius:8px;cursor:pointer">Vaciar</button>
   </div>
   <div class="btbl"><table id="bttable"></table></div>
   <div class="note">Los valores quedan congelados al momento de guardar. Se guardan solo en este dispositivo (este navegador).</div>
 </div>
 <div class="view" id="sens">
-  <div class="wip-banner"><b>Sección en revisión.</b> El cálculo anda, pero los techos de compra dependen de la carga y la suplementación todavía sin confirmar. Tomar como orientativo.</div>
-  <div class="flag"><b>Sensibilidad para la feria.</b> Cuánto es lo máximo que conviene pagar por kg según el peso del ternero, y cómo cambia ese techo con la tasa. Verde = al precio de mercado de hoy la compra cierra; rojo = está caro.</div>
-  <div class="card"><div class="hd"><span class="pin"></span>Precio máximo a pagar por peso de ingreso</div>
+  <div class="flag"><b>Sensibilidad.</b> A qué carga y suplementación cierra la compra para el lote actual, y el máximo a pagar según peso. Verde = la indiferencia supera lo pagado / el mercado.</div>
+  <div class="card"><div class="hd"><span class="pin"></span>Indiferencia según carga y suplementación</div>
+  <div class="bd"><div class="btbl"><table id="sensC"></table></div>
+  <p class="note">Indiferencia ($/kg máx a pagar) para el lote actual, variando la carga (cab/ha) y los días de suministro de suplemento. Verde = supera lo que pagaste. Es la palanca que más mueve el resultado.</p></div></div>
+  <div class="card" style="margin-top:16px"><div class="hd"><span class="pin"></span>Precio máximo a pagar por peso de ingreso</div>
   <div class="bd"><div class="btbl"><table id="sensA"></table></div>
   <p class="note">Indiferencia = techo de compra (resultado 0). Mercado = precio de la Pizarra para ese peso. Margen = cuánto te sobra (o falta) pagando el precio de mercado. Usa la categoría, destino y parámetros actuales.</p></div></div>
   <div class="card" style="margin-top:16px"><div class="hd"><span class="pin"></span>Indiferencia CON financiero según peso × tasa (TNA)</div>
@@ -256,10 +261,17 @@ function saveLote(){
 }
 function delLote(i){ const a=loadLotes(); a.splice(i,1); persistLotes(a); renderBacktest(); }
 function clearLotes(){ if(confirm("¿Vaciar todos los lotes guardados?")){ persistLotes([]); renderBacktest(); } }
+function exportLotes(){
+  const a=loadLotes(); if(!a.length){ alert("No hay lotes para exportar."); return; }
+  const head="fecha,categoria,peso_ingreso,peso_salida,destino,pagado,indiferencia,diferencia,estado";
+  const rows=a.map(l=>[l.f,l.cat,l.ent,l.sal,l.dest,l.pag,l.indif,l.dif,l.estado].join(","));
+  const csv=head+"\n"+rows.join("\n"); const blob=new Blob([csv],{type:"text/csv;charset=utf-8"});
+  const url=URL.createObjectURL(blob); const el=document.createElement("a"); el.href=url; el.download="mis-lotes-recria.csv"; document.body.appendChild(el); el.click(); document.body.removeChild(el); URL.revokeObjectURL(url);
+}
 function bandOf(w,t){let r=t[0];for(const x of t){if(x[0]<=w)r=x;}return r;}
 function vlook(w,t){/* precio = promedio de banda; interpolamos por el punto medio de cada banda */ const m=t.map((p,i)=>[i<t.length-1?(p[0]+t[i+1][0])/2:p[0]+15,p[1]]); if(w<=m[0][0])return m[0][1]; for(let i=0;i<m.length-1;i++){if(w>=m[i][0]&&w<m[i+1][0])return m[i][1]+(m[i+1][1]-m[i][1])*(w-m[i][0])/(m[i+1][0]-m[i][0]);} return m[m.length-1][1];}
 const PARAMS={aum:0.5,tasa:0.19,plzc:30,plzv:30,base:"Compra + Costos",mortc:0.025,
-  modoCampo:"Alquiler",pctCapt:0.30,sieMet:"Aéreo (voleo)",tcUSD:1446,semPr:0.65,labAv:30,labTe:40,semAv:55,semTe:40,pastImpl:368735,pastDur:4,mant:176900,alqKg:75,alqNov:4179,car:1.0,consMS:0.028,pctsupl:0.40,diasSupl:0,markupSupl:0.05,pMaiz:217761,pSilo:166257,pNucleo:409050,rMaiz:10,rSilo:85,rNucleo:5,msMaiz:87,msSilo:50,msNucleo:97.5,hotel:0,san:7500,comc:0.03,comv:0.03,gui:1725,desb:0,desbv:0.05,deco:0,
+  modoCampo:"Alquiler",pctCapt:0.30,sieMet:"Aéreo (voleo)",tcUSD:1446,semPr:0.65,labAv:30,labTe:40,semAv:55,semTe:40,pastImpl:368735,pastDur:4,mant:176900,alqKg:75,alqNov:4179,car:3.0,consMS:0.028,pctsupl:0.40,diasSupl:30,markupSupl:0.05,pMaiz:217761,pSilo:166257,pNucleo:409050,rMaiz:10,rSilo:85,rNucleo:5,msMaiz:87,msSilo:50,msNucleo:97.5,hotel:0,san:7500,comc:0.03,comv:0.03,gui:1725,desb:0,desbv:0.05,deco:0,
   tarifa:3000,cfijo:0,jcomp:12000,jvent:19000,ivavh:0.105,ivach:0.105,ivaf:0.21,ivas:0.21,mni:224000,alic:0.02};
 const NEG={categ:"Machos",modo:"Por días",ent:180,sal:330,dias_in:150,pag:6556,objcab:0,
   dest:"TRANSFERENCIA",fuente:"CACG por kilo",psalin:4800,rinde:0.52,kmi:150,kms:640};
@@ -665,6 +677,13 @@ function renderSens(){
     A+=`<tr><td class="l">${w} kg</td><td class="num">${f0(R.indif)}</td><td class="num">${f0(merc)}</td><td class="num ${marg>=0?'pos':'neg'}">${f0p(marg)}</td><td><span class="pill ${marg>=0?'ok':'bad'}">${marg>=0?'Comprar':'Caro'}</span></td></tr>`;
   }
   document.getElementById("sensA").innerHTML=A;
+  const cargas=[1,2,3,4,5], dsl=[{l:"todo",v:0},{l:"30 días",v:30},{l:"15 días",v:15}];
+  let C=`<tr><th class="l">Carga</th>`+dsl.map(d=>`<th>${d.l}</th>`).join("")+`</tr>`;
+  for(const c of cargas){ C+=`<tr><td class="l">${c} cab/ha</td>`;
+    for(const d of dsl){ const R=calc(NEG,{...PARAMS,car:c,diasSupl:d.v}), ok=R.indif>=NEG.pag;
+      C+=`<td class="num" style="background:${ok?'var(--verde-bg)':'var(--rojo-bg)'};color:${ok?'var(--verde)':'var(--rojo)'};font-weight:700">${f0(R.indif)}</td>`; }
+    C+=`</tr>`; }
+  const sc=document.getElementById("sensC"); if(sc) sc.innerHTML=C;
   const tasas=[0.19,0.25,0.30,0.40];
   let B=`<tr><th class="l">Peso ing.</th>${tasas.map(t=>`<th>TNA ${Math.round(t*100)}%</th>`).join("")}</tr>`;
   for(const w of pesos){

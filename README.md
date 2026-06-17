@@ -105,7 +105,7 @@ La app lee `precios.json` al abrir y actualiza la pizarra y los parámetros de m
 - **Modo Feria** (rápido: categoría + peso + destino → máximo a pagar, con rango máx/mín de la categoría) y **modo Completo** (simulador completo). El modo Feria refleja el destino y el modo de campo configurados.
 - Botón **Generar informe (PDF)**: arma un informe de una carilla con el estilo de la app y lo comparte como archivo.
 - Botón **Guardar lote**: guarda la evaluación actual (categoría, peso, destino, pagado, indiferencia, veredicto, fecha) en el dispositivo (`localStorage`), con los valores congelados al momento.
-- Pestañas: **Simulador**, **Detalle del cálculo** y **Mis lotes** (historial de lotes guardados en el dispositivo, con filtro buenas/malas y resumen). **Sensibilidad** sigue **en revisión**. (La vieja "Análisis de compras" con datos de prueba se reemplazó por "Mis lotes".)
+- Pestañas: **Simulador**, **Detalle del cálculo** y **Mis lotes** (historial de lotes guardados en el dispositivo, con filtro buenas/malas y resumen). **Sensibilidad** muestra la indiferencia según carga × suplementación. (La vieja "Análisis de compras" con datos de prueba se reemplazó por "Mis lotes".)
 
 ---
 
@@ -162,6 +162,16 @@ Los datos provisorios se marcan con un asterisco `*`.
 - Días de suministro reales de suplemento.
 - Precios de silo, núcleo y semilla.
 - Error en el Excel de Nico: mantenimiento usaba ×1,7 en vez de × tipo de cambio (corregido en el nuestro).
+
+---
+
+## Pendientes / próximos pasos (roadmap)
+
+- **Auto-update real de precios** (pendiente): GitHub Action programado que abra Entre Surcos con un navegador headless (la página renderiza con JS), lea las tablas y reescriba `precios.json` solo. Hoy el `precios.json` se actualiza a mano (Commit + Push).
+- **Validación contra las simulaciones de Nico** (en pausa, esperando que las pase) — comparar resultado e indiferencia caso por caso.
+- **Input del "valor de Lolo"** (a definir): el valor que Lolo le pide cambiar a Nico en el portal; cuando esté la definición, se suma como input y se aplica en la fórmula.
+- **Sincronizar "Mis lotes" entre dispositivos** (opcional): hoy es local al dispositivo; sincronizar requeriría un backend.
+- **App standalone** (a futuro): el modelo (`calc`) es JS puro y portable; ver "Documentación técnica".
 
 ---
 
@@ -243,6 +253,8 @@ Código sin referencias rotas y JS válido. Tests del modelo: break-even = 0; in
 
 Cada modificación de la app se anota acá (la más nueva arriba).
 
+- **17/06/2026 (3)** — Sección "Pendientes / próximos pasos (roadmap)" en el README (auto-update de precios, validación con Nico, input de Lolo, sync de Mis lotes, app standalone).
+- **17/06/2026 (2)** — Defaults más realistas (carga 3 cab/ha, días de suministro 30) + aviso "resultados preliminares". Pestaña Sensibilidad reconvertida: tabla de indiferencia según carga × suplementación (a qué carga cierra), salió de "en revisión". Exportar "Mis lotes" a CSV. Mismos defaults en el Excel.
 - **17/06/2026** — Capturas + guía de instalación + changelog en el README. Documentación técnica completa y auditoría integral. KPIs jerarquizados (3 principales + "ver más"). "Guardar lote" + pestaña "Mis lotes" (registro en el dispositivo) reemplazando la demo "Análisis de compras". Modo Feria con selector de destino y rango máx/mín de Entre Surcos. Parámetros básicos/avanzados. Informe PDF con estilo de la app. Pizarra `precios.json` por banda [peso, prom, máx, mín] + tipo de cambio y novillo arrendamiento.
 - **16/06/2026** — Cascada de costo por hectárea (verdeos voleo/avión + pasturas + mantenimiento + alquiler), dieta de 3 insumos (maíz/silo/núcleo) con markup y días de suministro, modos Alquiler/Capitalización, mortandad por ciclo + desbaste. Pizarra cambiada a Entre Surcos y Corrales. App PWA instalable (GitHub Pages) con service worker.
 

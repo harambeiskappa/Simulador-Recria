@@ -134,4 +134,4 @@ Validado contra la planilla de Nico:
 
 **Este README se actualiza con cada cambio del simulador** (qué se agrega, saca o modifica). Es la base de contexto para retomar el trabajo y para asistentes de IA (Copilot). Mantenerlo al día es obligatorio.
 
-_Última actualización: 17/06/2026 — modo Feria, parámetros básicos/avanzados, informe PDF, pizarra Entre Surcos, cascada por hectárea, dieta de 3 insumos, modos alquiler/capitalización._
+_Última actualización: 17/06/2026 — modo Feria (con rango máx/mín de Entre Surcos), parámetros básicos/avanzados, informe PDF, pizarra Entre Surcos, cascada por hectárea, dieta de 3 insumos, modos alquiler/capitalización. La pizarra (`precios.json`) ahora guarda por banda [peso, prom, máx, mín]._

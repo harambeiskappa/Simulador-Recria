@@ -131,8 +131,71 @@ Validado contra la planilla de Nico:
 
 ---
 
+## Documentación técnica (para devs / IA / app standalone)
+
+### Arquitectura
+- **Un solo archivo `index.html`**: HTML + CSS (en `<style>`) + JS vanilla, sin frameworks ni build.
+- 2 librerías externas por CDN, solo para el informe PDF: **jsPDF** y **html2canvas**.
+- PWA: `sw.js` (caché + red-primero) y `manifest.json`.
+- Tema "Pampa": verde `#13402c`/`#1f6242`, dorado `#b8862f`, semáforo verde `#1f8a4c` / rojo `#c0392b`. Fuente Inter.
+
+### Estado global (objetos JS)
+- **`NEG`** (datos del negocio, input del usuario): `categ` (Machos/Hembras), `modo` (Por días/Por peso), `ent` (peso ingreso kg), `sal` (peso salida kg, si Por peso), `dias_in` (días en campo, si Por días), `pag` (precio pagado $/kg), `objcab` (objetivo $/cab), `dest` (INVERNADA/FAENA/TRANSFERENCIA), `fuente` (CACG por kilo/ROSGAN índice/Manual), `psalin` (precio salida manual o $/kg carne), `rinde` (faena), `kmi`/`kms` (km compra/venta).
+- **`PARAMS`** (supuestos). Defaults actuales:
+  - Financiero: `tasa` 0.19, `base` "Compra + Costos", `plzc` 30, `plzv` 30.
+  - Productivo/campo: `aum` 0.5, `mortc` 0.025 (por ciclo), `modoCampo` "Alquiler", `pctCapt` 0.30, `car` 1.0, `san` 7500, `hotel` 0.
+  - Verdeos: `sieMet` "Aéreo (voleo)", `tcUSD` 1446, `semPr` 0.65, `labAv` 30, `semAv` 55, `labTe` 40, `semTe` 40.
+  - Campo: `pastImpl` 368735, `pastDur` 4, `mant` 176900, `alqKg` 75, `alqNov` 4179.
+  - Suplementación: `pctsupl` 0.40, `diasSupl` 0 (0 = todo el ciclo), `markupSupl` 0.05, `consMS` 0.028; dieta `pMaiz` 217761/`pSilo` 166257/`pNucleo` 409050, partes `rMaiz` 10/`rSilo` 85/`rNucleo` 5, `msMaiz` 87/`msSilo` 50/`msNucleo` 97.5.
+  - Comercial/flete/impuestos: `comc` 0.03, `comv` 0.03, `gui` 1725, `desb` 0, `desbv` 0.05, `deco` 0, `tarifa` 3000, `cfijo` 0, `jcomp` 12000, `jvent` 19000, `ivavh` 0.105, `ivach` 0.105, `ivaf` 0.21, `ivas` 0.21, `mni` 224000, `alic` 0.02.
+- **`PIZ`** (pizarra): `machos`/`hembras` = array de bandas `[pesoDesde, promedio, máx, mín]`; `rosgan`, `novillo`, `maiz` (números). Se completa desde `precios.json`.
+
+### Función central `calc(N, P)` — devuelve todos los resultados
+1. `dias`: Por días = `dias_in`; Por peso = `(sal−ent)/aum`.
+2. `salef` (peso salida efectivo) = Por días: `ent+aum·dias`; Por peso: `sal`. `kgp = salef−ent`.
+3. Fletes: `flei=(kmi·tarifa+cfijo)/jcomp`; `fles=(kms·tarifa)/jvent`.
+4. Dieta: `costoDietaTon=Σ(precio·partes)/Σpartes`; `msDieta=Σ(%MS·partes)/Σpartes`; `consTCpv=consMS/(msDieta/100)`.
+5. Verdeos: aéreo `(labAv+semAv·semPr)`, terrestre `(labTe+semTe·semPr)`, `×tcUSD` = `verdImpl`.
+6. `campoHa = verdImpl + pastImpl/pastDur + mant + alqKg·alqNov`.
+7. `psal` ($/kg salida): FAENA=`psalin·rinde`; TRANSFERENCIA=`vlook(salef)`; INVERNADA=según fuente (Manual=`psalin`, ROSGAN=`PIZ.rosgan`, CACG=`vlook(salef)`).
+8. **Modo campo**: Capitalización → `atot=kgp·pctCapt·psal` y `stot=hot=san=0`. Alquiler → `atot=campoHa/car/365·dias`; `stot=pesoProm·consTCpv·pctsupl·díasSuministro·(costoDietaTon/1000)·(1+markup)`; `hot=dias·hotel`. `díasSuministro = diasSupl>0 ? diasSupl : dias`.
+9. `cp = atot+stot+hot+san` (costos de producción).
+10. Compra: `cnkg=pag·(1+desb+comc)+flei`; `cn=cnkg·ent`.
+11. Venta: `kgv=salef·(1−mortc)·(1−desbv)` (mortandad por ciclo + desbaste descontados de los kilos); `gv` (gastos venta, 0 en TRANSFERENCIA)=`psal·(comv+deco)+fles+gui/kgv`; `vnkg=psal−gv`; `vn=vnkg·kgv`.
+12. **Resultado** = `vn − cn − cp`.
+13. Financiero: `díasFin=max(0,dias−plzc+plzv)`; `rf=tasa/365·díasFin`; `fin=rf·capitalBase` (base = cn, o cn+cp); `rescf=res−fin`.
+14. **Indiferencia** = `((vn−cp)/ent − flei)/(1+desb+comc)` (la mortandad/desbaste ya están en `kgv`). Variantes: `indifcf` (con financiero), `indifobj` (con objetivo $/cab).
+15. Indicadores: `TEA=(1+res/(cn+cp))^(365/dias)−1`; `resanual=res·365/dias`; `costokg=cp/kgp`; `relrepo=pag/psal`; puntos de equilibrio `ventaInd`, `racionInd`.
+
+`vlook(w,tabla)` interpola el promedio por el punto medio de cada banda. `bandOf(w,tabla)` devuelve la banda completa (para máx/mín en Feria).
+
+### Funciones de UI (usan NEG/PARAMS/PIZ globales)
+`renderNegocio`/`renderComercial` (forms), `renderParams` (panel ⚙: `PBASIC` visibles + `PADV` en `<details>`), `renderAll` (resultado/semáforo + KPIs 3+«ver más» + pizarra + detalle + Mis lotes + sensibilidad), `renderQuick`/`updateQuick` (modo Feria), `setMode("rapido"/"completo")`, `renderDetalle`, `renderPiz`/`curveSVG`, `renderBacktest` (Mis lotes), `renderSens`, `gaugeSVG`, `kpi`/`chip`/`pfield` (helpers), formato `f0`/`f0p`/`f1`/`fp`.
+
+### Mis lotes (localStorage)
+Clave `recriaLotes` → array de `{f (fecha), cat, ent, sal, dest, pag, indif, dif, estado}` con valores **congelados** al guardar. Funciones: `saveLote`, `loadLotes`, `persistLotes`, `delLote`, `clearLotes`.
+
+### Informe PDF
+`generateReport()` arma un nodo HTML con el estilo de la app → `html2canvas` (imagen) → `jsPDF` (A4) → `navigator.share` (archivo) o descarga.
+
+### Auto-update (`precios.json`)
+`{ fecha, machos:[[peso,prom,máx,mín]…], hembras:[…], rosgan, novillo, novilloArr, tcUSD, maiz }`. La app lo lee al abrir (`fetch` no-store) y actualiza `PIZ` + `PARAMS.tcUSD` + `PARAMS.alqNov`.
+
+### PWA
+`sw.js` (CACHE `recria-v4`): `index.html` y `precios.json` = **red-primero** (siempre lo último, cae a caché sin internet); resto = caché-primero con guardado oportunista (cachea jsPDF/html2canvas tras el primer uso). Al cambiar `index.html` no hace falta reinstalar; al cambiar `sw.js`, subir el número de versión.
+
+### Notas para una app standalone (futuro)
+- El modelo (`calc`) es **JS puro sin dependencias del DOM**: se puede portar tal cual a React Native / Flutter reescribiendo solo la UI.
+- "Mis lotes" es local (localStorage); sincronizar entre dispositivos requeriría un backend.
+- La pizarra se actualiza por archivo; para auto-update real haría falta un scraper de Entre Surcos (la página renderiza con JS, requiere navegador headless) que escriba `precios.json`.
+
+### Última auditoría (17/06/2026)
+Código sin referencias rotas y JS válido. Tests del modelo: break-even = 0; indiferencia monótona con el peso; modos Alquiler/Capitalización OK; los 3 destinos coherentes (Invernada < Transferencia por gastos de venta; Faena no cierra desde terneros comprados); cascada por ha y dieta validadas contra la planilla de Nico. Modo Feria usa el mismo `calc` que Completo.
+
+---
+
 ## Regla del proyecto (importante)
 
 **Este README se actualiza con cada cambio del simulador** (qué se agrega, saca o modifica). Es la base de contexto para retomar el trabajo y para asistentes de IA (Copilot). Mantenerlo al día es obligatorio.
 
-_Última actualización: 17/06/2026 — KPIs jerarquizados (3 principales visibles + "Ver más indicadores"); "Guardar lote" + pestaña "Mis lotes" (registro en el dispositivo) reemplazando la "Análisis de compras" de prueba; selector de destino en modo Feria con rango máx/mín de Entre Surcos; parámetros básicos/avanzados; informe PDF; cascada por hectárea; dieta de 3 insumos; modos alquiler/capitalización. La pizarra (`precios.json`) guarda por banda [peso, prom, máx, mín]._
+_Última actualización: 17/06/2026 — documentación técnica completa (modelo, datos, funciones, PWA, notas para standalone) + auditoría integral; KPIs jerarquizados (3 principales visibles + "Ver más indicadores"); "Guardar lote" + pestaña "Mis lotes" (registro en el dispositivo) reemplazando la "Análisis de compras" de prueba; selector de destino en modo Feria con rango máx/mín de Entre Surcos; parámetros básicos/avanzados; informe PDF; cascada por hectárea; dieta de 3 insumos; modos alquiler/capitalización. La pizarra (`precios.json`) guarda por banda [peso, prom, máx, mín]._

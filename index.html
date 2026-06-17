@@ -15,6 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="Recría">
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 :root{
   --bg:#eef1ed; --panel:#ffffff; --ink:#15241c; --muted:#6a746c; --line:#dce2db;
@@ -365,45 +366,56 @@ function shareResult(){
   else { alert(txt); }
 }
 function generateReport(){
-  if(!(window.jspdf&&window.jspdf.jsPDF)){ alert("El generador está cargando. Probá de nuevo en un instante."); return; }
-  const { jsPDF }=window.jspdf;
+  if(!window.html2canvas||!(window.jspdf&&window.jspdf.jsPDF)){ alert('El generador esta cargando. Proba de nuevo en un instante.'); return; }
   const R=calc(NEG,PARAMS); const buena=NEG.pag<=R.indif; const dif=R.indif-NEG.pag;
-  const dest={INVERNADA:"Invernada",FAENA:"Faena",TRANSFERENCIA:"Transferencia"}[NEG.dest]||NEG.dest;
-  const fecha=new Date().toLocaleDateString("es-AR");
-  const d=new jsPDF({unit:"pt",format:"a4"}); const W=595;
-  d.setFillColor(19,64,44); d.rect(0,0,W,92,"F");
-  d.setFillColor(184,134,47); d.rect(0,92,W,4,"F");
-  d.setTextColor(255,255,255); d.setFont("helvetica","bold"); d.setFontSize(18);
-  d.text("Informe de evaluacion de compra",40,46);
-  d.setFont("helvetica","normal"); d.setFontSize(10); d.setTextColor(200,214,204);
-  d.text("Simulador de Recria - Darwash SA - Feedlot El Aras",40,66);
-  d.setTextColor(255,255,255); d.setFontSize(10); d.text(fecha,W-40,46,{align:"right"});
-  let y=132;
-  if(buena){ d.setFillColor(231,244,236); d.setDrawColor(191,227,205); } else { d.setFillColor(251,234,232); d.setDrawColor(240,201,196); }
-  d.roundedRect(40,y,W-80,72,8,8,"FD");
-  d.setFont("helvetica","bold"); d.setFontSize(21);
-  if(buena){ d.setTextColor(31,138,76); d.text("VERDE - Buena compra",62,y+35); } else { d.setTextColor(192,57,43); d.text("ROJO - Mala compra",62,y+35); }
-  d.setFont("helvetica","normal"); d.setFontSize(11); d.setTextColor(60,74,64);
-  d.text(buena?"Se pago por debajo del precio de indiferencia.":"Se pago por encima de la indiferencia - corresponde reclamo a la feria.",62,y+56);
-  y+=104;
-  const rows=[["Categoria",NEG.categ],["Peso",Math.round(NEG.ent)+" a "+Math.round(R.salef)+" kg"],["Destino",dest],
-    ["Precio pagado",f0(NEG.pag)+" /kg"],["Precio de indiferencia",f0(R.indif)+" /kg"],["Diferencia",f0p(dif)+" /kg"],
-    ["Rentabilidad (TEA)",fp(R.tea)+"  -  tasa "+fp(PARAMS.tasa)],["Resultado por cabeza",f0p(R.res)]];
-  d.setFontSize(11);
-  rows.forEach((r,i)=>{ const ry=y+i*27;
-    if(i%2===0){ d.setFillColor(246,244,238); d.rect(40,ry-16,W-80,27,"F"); }
-    d.setTextColor(106,116,108); d.setFont("helvetica","normal"); d.text(r[0],56,ry+1);
-    d.setTextColor(21,36,28); d.setFont("helvetica","bold"); d.text(String(r[1]),W-56,ry+1,{align:"right"}); });
-  y+=rows.length*27+26;
-  d.setDrawColor(220,226,219); d.line(40,y,W-40,y); y+=20;
-  d.setFont("helvetica","normal"); d.setFontSize(9.5); d.setTextColor(106,116,108);
-  d.text("Criterio: precio de compra de indiferencia (punto de equilibrio). Verde = compra conveniente;",40,y);
-  d.text("rojo = por encima de la indiferencia. Algunos parametros son estimados (provisorios).",40,y+14);
-  d.setFontSize(9); d.setTextColor(150,158,150);
-  d.text("Simulador de Recria - Darwash SA - "+fecha,40,820);
-  const blob=d.output("blob"); const file=new File([blob],"informe-recria.pdf",{type:"application/pdf"});
-  try{ if(navigator.canShare&&navigator.canShare({files:[file]})){ navigator.share({files:[file],title:"Informe de evaluacion de compra"}).catch(function(){}); return; } }catch(e){}
-  d.save("informe-recria.pdf");
+  const dest={INVERNADA:'Invernada',FAENA:'Faena',TRANSFERENCIA:'Transferencia'}[NEG.dest]||NEG.dest;
+  const fecha=new Date().toLocaleDateString('es-AR');
+  const kc=v=>v<0?'#c0392b':'#1f8a4c';
+  const box=(l,v)=>`<div style='background:#f6f4ee;border-radius:10px;padding:10px 13px'><div style='font-size:11px;color:#6a746c'>${l}</div><div style='font-size:15px;font-weight:700;color:#15241c;margin-top:2px'>${v}</div></div>`;
+  const kpi=(l,v,n,c)=>`<div style='background:#fff;border:1px solid #dce2db;border-radius:10px;padding:11px 13px'><div style='font-size:11px;color:#6a746c'>${l}</div><div style='font-size:18px;font-weight:800;color:${c};margin-top:3px'>${v}</div><div style='font-size:10.5px;color:#9aa39a;margin-top:1px'>${n}</div></div>`;
+  const sheet=document.createElement('div');
+  sheet.style.cssText='position:fixed;left:-99999px;top:0;width:720px;background:#fff;font-family:Inter,Arial,sans-serif';
+  sheet.innerHTML=`
+    <div style='background:#13402c;padding:22px 26px;display:flex;justify-content:space-between;align-items:flex-start'>
+      <div><div style='color:#fff;font-size:21px;font-weight:800'>Informe de evaluacion de compra</div>
+      <div style='color:#c8d6cc;font-size:12px;margin-top:3px'>Simulador de Recria \u00b7 Darwash SA \u00b7 Feedlot El Aras</div></div>
+      <div style='color:#fff;font-size:12px'>${fecha}</div></div>
+    <div style='height:5px;background:#b8862f'></div>
+    <div style='padding:22px 26px'>
+      <div style='background:${buena?'#e7f4ec':'#fbeae8'};border:1px solid ${buena?'#bfe3cd':'#f0c9c4'};border-radius:14px;padding:18px 20px'>
+        <div style='font-size:24px;font-weight:800;color:${buena?'#1f8a4c':'#c0392b'}'>${buena?'VERDE \u2014 Buena compra':'ROJO \u2014 Mala compra'}</div>
+        <div style='font-size:13px;color:#3a4a40;margin-top:4px'>${buena?'Se pago por debajo del precio de indiferencia.':'Se pago por encima de la indiferencia \u2014 corresponde reclamo a la feria.'}</div>
+        <div style='display:flex;gap:28px;margin-top:14px;padding-top:14px;border-top:1px solid rgba(0,0,0,.08)'>
+          <div><div style='font-size:21px;font-weight:800;color:#15241c'>${f0(R.indif)}</div><div style='font-size:11px;color:#6a746c'>Indiferencia $/kg</div></div>
+          <div><div style='font-size:21px;font-weight:800;color:#15241c'>${f0(NEG.pag)}</div><div style='font-size:11px;color:#6a746c'>Pagado $/kg</div></div>
+          <div><div style='font-size:21px;font-weight:800;color:${kc(dif)}'>${f0p(dif)}</div><div style='font-size:11px;color:#6a746c'>Diferencia $/kg</div></div>
+        </div></div>
+      <div style='display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px'>
+        ${box('Categoria',NEG.categ)}${box('Peso',Math.round(NEG.ent)+' \u2192 '+Math.round(R.salef)+' kg')}
+        ${box('Destino',dest)}${box('Dias en campo',Math.round(R.dias)+' dias')}
+      </div>
+      <div style='font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#b8862f;margin:18px 0 8px'>Indicadores</div>
+      <div style='display:grid;grid-template-columns:1fr 1fr;gap:10px'>
+        ${kpi('Rentabilidad anual (TEA)',fp(R.tea),'vs tasa '+fp(PARAMS.tasa)+(R.tea>=PARAMS.tasa?' \u00b7 le gana':' \u00b7 no le gana'),kc(R.tea-PARAMS.tasa))}
+        ${kpi('Resultado anual /cab-lugar',f0p(R.resanual),'normaliza el ciclo',kc(R.resanual))}
+        ${kpi('Resultado economico',f0p(R.res),'por cabeza / ciclo',kc(R.res))}
+        ${kpi('Resultado con financiero',f0p(R.rescf),'descontando la tasa',kc(R.rescf))}
+        ${kpi('Costo por kg producido',f0(R.costokg),'que cuesta cada kilo','#15241c')}
+        ${kpi('Relacion de reposicion',R.relrepo.toFixed(2).replace('.',',')+' x','pagado / salida \u00b7 informativo','#15241c')}
+      </div>
+      <div style='border-top:1px solid #dce2db;margin-top:18px;padding-top:12px;font-size:11px;color:#6a746c;line-height:1.55'>
+        Criterio: precio de compra de indiferencia (punto de equilibrio). Verde = compra conveniente; rojo = por encima de la indiferencia. Algunos parametros son provisorios.<br>Simulador de Recria \u00b7 Darwash SA \u2014 ${fecha}
+      </div></div>`;
+  document.body.appendChild(sheet);
+  html2canvas(sheet,{scale:2,backgroundColor:'#ffffff',windowWidth:720}).then(canvas=>{
+    if(document.body.contains(sheet))document.body.removeChild(sheet);
+    const { jsPDF }=window.jspdf; const img=canvas.toDataURL('image/png');
+    const pdf=new jsPDF({unit:'pt',format:'a4'}); const pw=595,m=22,iw=pw-2*m,ih=canvas.height*(iw/canvas.width);
+    pdf.addImage(img,'PNG',m,m,iw,ih);
+    const blob=pdf.output('blob'); const file=new File([blob],'informe-recria.pdf',{type:'application/pdf'});
+    try{ if(navigator.canShare&&navigator.canShare({files:[file]})){ navigator.share({files:[file],title:'Informe de evaluacion de compra'}).catch(function(){}); return; } }catch(e){}
+    pdf.save('informe-recria.pdf');
+  }).catch(function(){ if(document.body.contains(sheet))document.body.removeChild(sheet); alert('No se pudo generar el informe.'); });
 }
 function renderAll(){
   const R=calc(NEG,PARAMS), ok=R.estado==="Buena";

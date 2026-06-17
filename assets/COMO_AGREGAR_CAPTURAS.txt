@@ -1,0 +1,18 @@
+CÓMO ACTUALIZAR LAS CAPTURAS DEL SIMULADOR
+==========================================
+
+El README muestra las capturas que están en esta carpeta (assets/).
+Nombres usados actualmente (mantené los mismos para que el README las siga mostrando):
+
+  feria.jpeg       -> modo Feria (categoría + peso + máximo a pagar)
+  completo1.jpeg   -> modo Completo: datos del negocio
+  completo2.jpeg   -> modo Completo: resultado (semáforo) + indicadores
+  completo3.jpeg   -> modo Completo: indicadores + pizarra de referencia
+  detalle.jpeg     -> pestaña "Detalle del cálculo"
+  mis-lotes.jpeg   -> pestaña "Mis lotes"
+
+Para actualizar una captura: reemplazá el archivo por uno nuevo con EL MISMO nombre,
+y subílo con GitHub Desktop (Commit + Push). Se actualiza sola en el README.
+
+Si agregás una captura nueva con otro nombre, avisale a quien edite el README
+para sumar la referencia en la sección "Capturas".

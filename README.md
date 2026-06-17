@@ -11,6 +11,26 @@ Vive en: https://harambeiskappa.github.io/Simulador-Recria/
 
 ---
 
+## Capturas
+
+**Modo Feria** — categoría + peso + destino → máximo a pagar:
+
+<img src="assets/feria.jpeg" width="300" alt="Modo Feria">
+
+**Modo Completo** — datos del negocio, resultado (semáforo), indicadores y pizarra de referencia:
+
+<img src="assets/completo1.jpeg" width="265" alt="Completo: datos del negocio"> <img src="assets/completo2.jpeg" width="265" alt="Completo: resultado e indicadores"> <img src="assets/completo3.jpeg" width="265" alt="Completo: indicadores y pizarra">
+
+**Detalle del cálculo:**
+
+<img src="assets/detalle.jpeg" width="300" alt="Detalle del cálculo">
+
+**Mis lotes** — historial de compras evaluadas:
+
+<img src="assets/mis-lotes.jpeg" width="300" alt="Mis lotes">
+
+---
+
 ## A qué apunta
 
 - **Uso en el ruedo, desde el celular** (modo *Feria*: categoría + peso → máximo a pagar, sin escribir precio).
@@ -86,6 +106,31 @@ La app lee `precios.json` al abrir y actualiza la pizarra y los parámetros de m
 - Botón **Generar informe (PDF)**: arma un informe de una carilla con el estilo de la app y lo comparte como archivo.
 - Botón **Guardar lote**: guarda la evaluación actual (categoría, peso, destino, pagado, indiferencia, veredicto, fecha) en el dispositivo (`localStorage`), con los valores congelados al momento.
 - Pestañas: **Simulador**, **Detalle del cálculo** y **Mis lotes** (historial de lotes guardados en el dispositivo, con filtro buenas/malas y resumen). **Sensibilidad** sigue **en revisión**. (La vieja "Análisis de compras" con datos de prueba se reemplazó por "Mis lotes".)
+
+---
+
+## Instalar la app (iPhone, Android, PC)
+
+Link para compartir: **https://harambeiskappa.github.io/Simulador-Recria/**
+
+**iPhone (Safari)** — debe ser Safari, en Chrome no aparece la opción:
+1. Abrí el link en Safari.
+2. Tocá **Compartir** (el cuadrado con la flecha ↑).
+3. **Agregar a pantalla de inicio** → **Agregar**.
+
+**Android (Chrome):**
+1. Abrí el link en Chrome.
+2. Menú **⋮** → **Instalar app** (o **Agregar a pantalla de inicio**).
+
+**Windows (Chrome o Edge):**
+1. Abrí el link.
+2. En la barra de direcciones, ícono **Instalar** (monitor con flecha ↓), o menú **⋮ → Apps/Aplicaciones → Instalar este sitio como app**.
+
+**Mac:**
+- **Safari**: menú **Archivo → Agregar al Dock**.
+- **Chrome**: ícono **Instalar** en la barra de direcciones → **Instalar**.
+
+Una vez instalada queda con ícono propio, abre en pantalla completa y funciona sin internet. Las actualizaciones entran solas al reabrir (gracias al service worker "red-primero").
 
 ---
 
@@ -194,8 +239,17 @@ Código sin referencias rotas y JS válido. Tests del modelo: break-even = 0; in
 
 ---
 
+## Registro de cambios (changelog)
+
+Cada modificación de la app se anota acá (la más nueva arriba).
+
+- **17/06/2026** — Capturas + guía de instalación + changelog en el README. Documentación técnica completa y auditoría integral. KPIs jerarquizados (3 principales + "ver más"). "Guardar lote" + pestaña "Mis lotes" (registro en el dispositivo) reemplazando la demo "Análisis de compras". Modo Feria con selector de destino y rango máx/mín de Entre Surcos. Parámetros básicos/avanzados. Informe PDF con estilo de la app. Pizarra `precios.json` por banda [peso, prom, máx, mín] + tipo de cambio y novillo arrendamiento.
+- **16/06/2026** — Cascada de costo por hectárea (verdeos voleo/avión + pasturas + mantenimiento + alquiler), dieta de 3 insumos (maíz/silo/núcleo) con markup y días de suministro, modos Alquiler/Capitalización, mortandad por ciclo + desbaste. Pizarra cambiada a Entre Surcos y Corrales. App PWA instalable (GitHub Pages) con service worker.
+
+---
+
 ## Regla del proyecto (importante)
 
 **Este README se actualiza con cada cambio del simulador** (qué se agrega, saca o modifica). Es la base de contexto para retomar el trabajo y para asistentes de IA (Copilot). Mantenerlo al día es obligatorio.
 
-_Última actualización: 17/06/2026 — documentación técnica completa (modelo, datos, funciones, PWA, notas para standalone) + auditoría integral; KPIs jerarquizados (3 principales visibles + "Ver más indicadores"); "Guardar lote" + pestaña "Mis lotes" (registro en el dispositivo) reemplazando la "Análisis de compras" de prueba; selector de destino en modo Feria con rango máx/mín de Entre Surcos; parámetros básicos/avanzados; informe PDF; cascada por hectárea; dieta de 3 insumos; modos alquiler/capitalización. La pizarra (`precios.json`) guarda por banda [peso, prom, máx, mín]._
+_Última actualización: 17/06/2026 — sección Capturas + guía de instalación (iOS/Android/PC) + changelog; documentación técnica completa (modelo, datos, funciones, PWA, notas para standalone) + auditoría integral; KPIs jerarquizados (3 principales visibles + "Ver más indicadores"); "Guardar lote" + pestaña "Mis lotes" (registro en el dispositivo) reemplazando la "Análisis de compras" de prueba; selector de destino en modo Feria con rango máx/mín de Entre Surcos; parámetros básicos/avanzados; informe PDF; cascada por hectárea; dieta de 3 insumos; modos alquiler/capitalización. La pizarra (`precios.json`) guarda por banda [peso, prom, máx, mín]._

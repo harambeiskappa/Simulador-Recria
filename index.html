@@ -157,6 +157,11 @@ table{border-collapse:collapse;width:100%;font-size:13px}
 .seg{display:flex;gap:4px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:3px}
 .sgb{flex:1;border:none;background:transparent;color:var(--muted);font-weight:700;font-size:13.5px;padding:9px;border-radius:6px;cursor:pointer}
 .sgb.active{background:var(--green2);color:#fff}
+.morekpi{margin-top:10px}
+.morekpi>summary{cursor:pointer;list-style:none;font-size:12px;font-weight:700;color:var(--muted);display:flex;align-items:center;gap:6px;padding:8px 2px}
+.morekpi>summary::-webkit-details-marker{display:none}
+.morekpi>summary .ch{transition:.2s;margin-left:2px}
+.morekpi[open]>summary .ch{transform:rotate(180deg)}
 .qmini{flex:1;min-width:130px;background:var(--bg);border-radius:9px;padding:10px 13px}
 .qmini .l{font-size:11px;color:var(--muted)}.qmini .v{font-size:16px;font-weight:800;margin-top:2px}
 .qinput{position:relative;display:flex;align-items:center}
@@ -196,7 +201,7 @@ table{border-collapse:collapse;width:100%;font-size:13px}
     <div id="formParams"></div></div>
   <div class="secttl" style="margin-top:24px">2 · Resultado</div>
   <div class="grid2">
-    <div><div id="resultBox"></div><div class="kpis" id="kpis"></div></div>
+    <div><div id="resultBox"></div><div id="kpis"></div></div>
     <div id="pizPanel"></div>
   </div>
   <div class="hint">Editá los datos y el resultado se recalcula al instante. <sup class='rev'>*</sup> algunos datos son estimados.</div>
@@ -548,14 +553,20 @@ function renderAll(){
     </div>`;
   const teaOk=R.tea>=PARAMS.tasa;
   document.getElementById("kpis").innerHTML=
-    kpi("Rentabilidad anual (TEA)",fp(R.tea),`vs TNA ${fp(PARAMS.tasa)} · ${teaOk?'le gana ✓':'no le gana'}`,true,teaOk?'pos':'neg')+
-    kpi("Resultado anual por cab-lugar",f0p(R.resanual),"normaliza el ciclo",true,R.resanual>=0?'pos':'neg')+
-    kpi("Resultado económico",f0p(R.res),"por cabeza / ciclo",false,R.res>=0?'pos':'neg')+
-    kpi("Resultado con financiero",f0p(R.rescf),"descontando la tasa",false,R.rescf>=0?'pos':'neg')+
-    kpi("Retorno sobre total",fp(R.rt),"resultado ÷ (compra+costos)",false,'')+
-    kpi("Costo por kg producido",f0(R.costokg),"qué cuesta cada kilo",false,'')+
-    kpi("Relación de reposición",R.relrepo.toFixed(2).replace(".",",")+" x","pagado ÷ salida · informativo",false,'')+
-    kpi("Indiferencia objetivo",f0(R.indifobj),"máx a pagar p/ ganar "+f0(NEG.objcab)+"/cab",true,'');
+    '<div class="kpis">'+
+      kpi("Rentabilidad anual (TEA)",fp(R.tea),`vs TNA ${fp(PARAMS.tasa)} · ${teaOk?'le gana ✓':'no le gana'}`,true,teaOk?'pos':'neg')+
+      kpi("Resultado económico",f0p(R.res),"por cabeza / ciclo",true,R.res>=0?'pos':'neg')+
+      kpi("Resultado anual por cab-lugar",f0p(R.resanual),"normaliza el ciclo",true,R.resanual>=0?'pos':'neg')+
+    '</div>'+
+    `<details class="morekpi" ${kpiOpen?'open':''} ontoggle="kpiOpen=this.open">`+
+      '<summary>Ver más indicadores<span class="ch">▾</span></summary>'+
+      '<div class="kpis" style="margin-top:10px">'+
+        kpi("Resultado con financiero",f0p(R.rescf),"descontando la tasa",false,R.rescf>=0?'pos':'neg')+
+        kpi("Retorno sobre total",fp(R.rt),"resultado ÷ (compra+costos)",false,'')+
+        kpi("Costo por kg producido",f0(R.costokg),"qué cuesta cada kilo",false,'')+
+        kpi("Relación de reposición",R.relrepo.toFixed(2).replace(".",",")+" x","pagado ÷ salida · informativo",false,'')+
+        kpi("Indiferencia objetivo",f0(R.indifobj),"máx a pagar p/ ganar "+f0(NEG.objcab)+"/cab",false,'')+
+      '</div></details>';
   renderDetalle(R); renderPiz(R); renderBacktest(); renderSens();
 }
 function kpi(l,v,n,star,cls){return `<div class="kpi ${star?'star':''} ${cls||''}"><div class="l">${star?'<span class="st">★</span>':''}${l}</div><div class="v num">${v}</div><div class="n">${n}</div></div>`;}
@@ -628,7 +639,7 @@ function renderDetalle(R){
     <tr class="tot"><td>RESULTADO ECONÓMICO</td><td class="num" style="color:${R.res>=0?'var(--verde)':'var(--rojo)'}">${f0p(R.res)}</td></tr></table>`;
   document.getElementById("detalle").innerHTML=`<div>${c1}</div><div>${c2}</div>`;
 }
-let BTFILTER="all", BTFERIA="all";
+let BTFILTER="all", BTFERIA="all", kpiOpen=false;
 function renderBacktest(){
   const lotes=loadLotes(); const rows=lotes.map((l,i)=>({...l,_i:i}));
   const nb=rows.filter(r=>r.estado==="Buena").length;

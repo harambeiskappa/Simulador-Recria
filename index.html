@@ -148,6 +148,17 @@ table{border-collapse:collapse;width:100%;font-size:13px}
   .field{flex-wrap:wrap}.field input,.field select{width:100%}
   header h1{font-size:16px}
 }
+
+.modetoggle{display:flex;gap:6px;margin-bottom:18px;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:4px;width:fit-content;box-shadow:var(--shadow)}
+.mt{border:none;background:transparent;color:var(--muted);font-size:13.5px;font-weight:700;padding:9px 18px;border-radius:8px;cursor:pointer;transition:.15s}
+.mt.active{background:var(--green2);color:#fff}
+.qrow{display:flex;gap:12px;flex-wrap:wrap}.qrow>div{flex:1;min-width:140px}
+.qlb{display:block;font-size:12px;color:var(--muted);margin-bottom:5px}
+.seg{display:flex;gap:4px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:3px}
+.sgb{flex:1;border:none;background:transparent;color:var(--muted);font-weight:700;font-size:13.5px;padding:9px;border-radius:6px;cursor:pointer}
+.sgb.active{background:var(--green2);color:#fff}
+.qmini{flex:1;min-width:130px;background:var(--bg);border-radius:9px;padding:10px 13px}
+.qmini .l{font-size:11px;color:var(--muted)}.qmini .v{font-size:16px;font-weight:800;margin-top:2px}
 </style>
 </head>
 <body>
@@ -167,6 +178,9 @@ table{border-collapse:collapse;width:100%;font-size:13px}
 </div>
 <div class="wrap">
 <div class="view active" id="sim">
+  <div class="modetoggle"><button class="mt active" data-m="rapido">⚡ Rápido</button><button class="mt" data-m="completo">Completo</button></div>
+  <div id="quickPanel"></div>
+  <div id="fullPanel" hidden>
   <div class="secttl">1 · Cargá los datos</div>
   <div class="grid2">
     <div class="card"><div class="hd"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="3" width="8" height="4" rx="1"/><path d="M9 5H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3"/></svg>Datos del negocio</div>
@@ -183,6 +197,7 @@ table{border-collapse:collapse;width:100%;font-size:13px}
     <div id="pizPanel"></div>
   </div>
   <div class="hint">Editá los datos y el resultado se recalcula al instante. <sup class='rev'>*</sup> algunos datos son estimados.</div>
+  </div>
 </div>
 <div class="view" id="det">
   <div class="card"><div class="hd"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3.5" y1="6" x2="3.51" y2="6"/><line x1="3.5" y1="12" x2="3.51" y2="12"/><line x1="3.5" y1="18" x2="3.51" y2="18"/></svg>Detalle del cálculo · por cabeza</div>
@@ -460,6 +475,54 @@ function generateReport(){
     pdf.save('informe-recria.pdf');
   }).catch(function(){ if(document.body.contains(sheet))document.body.removeChild(sheet); alert('No se pudo generar el informe.'); });
 }
+function setMode(m){
+  document.querySelectorAll(".mt").forEach(b=>b.classList.toggle("active",b.dataset.m===m));
+  const q=document.getElementById("quickPanel"),fu=document.getElementById("fullPanel"); if(!q||!fu)return;
+  if(m==="rapido"){ fu.hidden=true; q.hidden=false; renderQuick(); }
+  else { q.hidden=true; fu.hidden=false; renderNegocio(); renderComercial(); renderAll(); }
+}
+function renderQuick(){
+  const c=document.getElementById("quickPanel"); if(!c)return;
+  c.innerHTML=`
+   <div class="card" style="padding:18px">
+     <div class="qrow">
+       <div><label class="qlb">Categoría</label><div class="seg" id="qcat">${["Machos","Hembras"].map(o=>`<button class="sgb ${NEG.categ===o?'active':''}" data-cat="${o}">${o}</button>`).join("")}</div></div>
+       <div><label class="qlb">Peso de ingreso (kg)</label><input id="qpeso" class="num" type="number" step="5" value="${Math.round(NEG.ent)}"></div>
+     </div>
+     <div style="margin-top:16px;text-align:center;background:var(--green);color:#fff;border-radius:12px;padding:18px 16px">
+       <div style="font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:#bcd2c4">Máximo a pagar (indiferencia)</div>
+       <div id="qmax" style="font-size:36px;font-weight:800;margin-top:2px">—</div>
+       <div id="qsub" style="font-size:12px;color:#bcd2c4;margin-top:3px"></div>
+     </div>
+     <div class="qrow" style="margin-top:12px">
+       <div class="qmini"><div class="l">Mercado hoy</div><div class="v" id="qmercado">—</div></div>
+       <div class="qmini"><div class="l">Margen vs mercado</div><div class="v" id="qmargen">—</div></div>
+     </div>
+     <div id="qcierra" style="margin-top:11px;font-size:13px;font-weight:700;text-align:center"></div>
+     <div style="margin-top:14px;border-top:1px solid var(--line);padding-top:13px">
+       <label class="qlb">¿Cuánto te piden? ($/kg) — opcional</label>
+       <input id="qpag" class="num" type="number" step="10" value="${NEG.pag||''}">
+       <div id="qverdict" style="margin-top:9px"></div>
+     </div>
+   </div>`;
+  c.querySelectorAll("#qcat .sgb").forEach(b=>b.addEventListener("click",()=>{NEG.categ=b.dataset.cat; c.querySelectorAll("#qcat .sgb").forEach(x=>x.classList.toggle("active",x.dataset.cat===NEG.categ)); updateQuick(); renderAll();}));
+  c.querySelector("#qpeso").addEventListener("input",e=>{NEG.ent=parseFloat(e.target.value)||0; updateQuick(); renderAll();});
+  c.querySelector("#qpag").addEventListener("input",e=>{NEG.pag=parseFloat(e.target.value)||0; updateQuick(); renderAll();});
+  updateQuick();
+}
+function updateQuick(){
+  const c=document.getElementById("quickPanel"); if(!c||c.hidden)return;
+  const R=calc(NEG,PARAMS); const tbl=NEG.categ==="Machos"?PIZ.machos:PIZ.hembras;
+  const mercado=vlook(NEG.ent,tbl); const margen=R.indif-mercado; const cierra=mercado<=R.indif;
+  const S=(id,v)=>{const e=document.getElementById(id); if(e)e.innerHTML=v;};
+  S("qmax", f0(R.indif)+" <span style='font-size:15px'>/kg</span>");
+  S("qsub", NEG.categ+" · "+Math.round(NEG.ent)+" → "+Math.round(R.salef)+" kg · transferencia");
+  S("qmercado", f0(mercado)+" /kg");
+  const qm=document.getElementById("qmargen"); if(qm){qm.innerHTML=f0p(margen)+" /kg"; qm.style.color=cierra?"var(--verde)":"var(--rojo)";}
+  const qc=document.getElementById("qcierra"); if(qc){qc.innerHTML=cierra?"✓ A precio de mercado de hoy, la compra cierra":"✗ A precio de mercado de hoy, está caro"; qc.style.color=cierra?"var(--verde)":"var(--rojo)";}
+  const qv=document.getElementById("qverdict");
+  if(qv){ if(NEG.pag>0){ const buena=NEG.pag<=R.indif; qv.innerHTML=`<div style='text-align:center;font-weight:800;font-size:15px;color:${buena?"var(--verde)":"var(--rojo)"}'>${buena?"✓ VERDE — "+f0(R.indif-NEG.pag)+" por debajo":"✗ ROJO — "+f0(NEG.pag-R.indif)+" de más"}</div>`; } else qv.innerHTML=""; }
+}
 function renderAll(){
   const R=calc(NEG,PARAMS), ok=R.estado==="Buena";
   if(R.kgp<=0){
@@ -622,6 +685,8 @@ document.querySelectorAll(".fbtn").forEach(b=>b.addEventListener("click",()=>{
   b.classList.add("active"); BTFILTER=b.dataset.f; renderBacktest();
 }));
 document.getElementById("pizFecha").textContent=PIZ_FECHA;
+document.querySelectorAll(".mt").forEach(b=>b.addEventListener("click",()=>setMode(b.dataset.m)));
+setTimeout(()=>setMode("rapido"),0);
 function renderComercial(){
   const c=document.getElementById("formComercial");
   const F=[["N","kmi","Km de ingreso","km",NEG.kmi,0],["N","kms","Km de salida","km",NEG.kms,0],
@@ -635,7 +700,7 @@ function renderComercial(){
   }));
 }
 renderNegocio(); renderParams(); renderComercial(); renderAll();
-try{ fetch("precios.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(j=>{ if(!j)return; ["machos","hembras","rosgan","novillo","maiz"].forEach(k=>{ if(j[k]!=null) PIZ[k]=j[k]; }); if(j.tcUSD!=null) PARAMS.tcUSD=j.tcUSD; if(j.novilloArr!=null) PARAMS.alqNov=j.novilloArr; if(typeof renderParams==="function") renderParams(); if(typeof renderAll==="function") renderAll(); }).catch(function(){}); }catch(e){}
+try{ fetch("precios.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(j=>{ if(!j)return; ["machos","hembras","rosgan","novillo","maiz"].forEach(k=>{ if(j[k]!=null) PIZ[k]=j[k]; }); if(j.tcUSD!=null) PARAMS.tcUSD=j.tcUSD; if(j.novilloArr!=null) PARAMS.alqNov=j.novilloArr; if(typeof renderParams==="function") renderParams(); if(typeof renderAll==="function") renderAll(); if(typeof updateQuick==="function") updateQuick(); }).catch(function(){}); }catch(e){}
 </script>
 <script>
 if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){});});}

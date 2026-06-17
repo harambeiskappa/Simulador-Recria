@@ -501,11 +501,7 @@ function renderComercial(){
   }));
 }
 renderNegocio(); renderParams(); renderComercial(); renderAll();
-/* ===== Precios en vivo (PWA) ===== */
-try{ fetch("precios.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(j=>{
-  if(!j)return; ["machos","hembras","rosgan","novillo","maiz"].forEach(k=>{ if(j[k]!=null) PIZ[k]=j[k]; });
-  if(typeof renderAll==="function") renderAll();
-}).catch(function(){}); }catch(e){}
+try{ fetch("precios.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(j=>{ if(!j)return; ["machos","hembras","rosgan","novillo","maiz"].forEach(k=>{ if(j[k]!=null) PIZ[k]=j[k]; }); if(typeof renderAll==="function") renderAll(); }).catch(function(){}); }catch(e){}
 
 </script>
 <script>

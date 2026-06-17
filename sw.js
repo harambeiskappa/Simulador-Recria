@@ -1,5 +1,5 @@
 /* Service worker · Simulador de Recría */
-const CACHE = "recria-v2";
+const CACHE = "recria-v3";
 const SHELL = [
   "./index.html",
   "./manifest.json",
@@ -18,15 +18,17 @@ self.addEventListener("activate", e => {
   );
 });
 self.addEventListener("fetch", e => {
-  const url = new URL(e.request.url);
-  // precios.json: red primero (siempre lo más nuevo), cae a cache si no hay internet
-  if (url.pathname.endsWith("precios.json")) {
+  const req = e.request;
+  const url = new URL(req.url);
+  const isDoc = req.mode === "navigate" || url.pathname.endsWith("index.html") || url.pathname.endsWith("/");
+  // Documento principal y precios.json: RED PRIMERO (siempre lo último), cae a cache sin internet.
+  if (isDoc || url.pathname.endsWith("precios.json")) {
     e.respondWith(
-      fetch(e.request).then(r => { const cp = r.clone(); caches.open(CACHE).then(c => c.put(e.request, cp)); return r; })
-        .catch(() => caches.match(e.request))
+      fetch(req).then(r => { const cp = r.clone(); caches.open(CACHE).then(c => c.put(req, cp)); return r; })
+        .catch(() => caches.match(req).then(r => r || caches.match("./index.html")))
     );
     return;
   }
-  // resto: cache primero (app andando offline), si no, red
-  e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
+  // Resto (íconos, manifest): cache primero.
+  e.respondWith(caches.match(req).then(r => r || fetch(req)));
 });

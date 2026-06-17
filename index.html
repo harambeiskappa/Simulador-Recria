@@ -493,6 +493,7 @@ function renderQuick(){
        <div><label class="qlb">Categoría</label><div class="seg" id="qcat">${["Machos","Hembras"].map(o=>`<button class="sgb ${NEG.categ===o?'active':''}" data-cat="${o}">${o}</button>`).join("")}</div></div>
        <div><label class="qlb">Peso de ingreso</label><div class="qinput"><input id="qpeso" class="num" type="number" step="5" value="${Math.round(NEG.ent)}"><span class="qu">kg</span></div></div>
      </div>
+     <div style="margin-top:13px"><label class="qlb">Destino de salida</label><div class="seg" id="qdest">${[["TRANSFERENCIA","Transferencia"],["INVERNADA","Invernada"],["FAENA","Faena"]].map(d=>`<button class="sgb ${NEG.dest===d[0]?'active':''}" data-dest="${d[0]}">${d[1]}</button>`).join("")}</div></div>
      <div style="margin-top:16px;text-align:center;background:var(--green);color:#fff;border-radius:12px;padding:18px 16px">
        <div style="font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:#bcd2c4">Máximo a pagar (indiferencia)</div>
        <div id="qmax" style="font-size:36px;font-weight:800;margin-top:2px">—</div>
@@ -512,6 +513,7 @@ function renderQuick(){
   c.querySelectorAll("#qcat .sgb").forEach(b=>b.addEventListener("click",()=>{NEG.categ=b.dataset.cat; c.querySelectorAll("#qcat .sgb").forEach(x=>x.classList.toggle("active",x.dataset.cat===NEG.categ)); updateQuick(); renderAll();}));
   c.querySelector("#qpeso").addEventListener("input",e=>{NEG.ent=parseFloat(e.target.value)||0; updateQuick(); renderAll();});
   c.querySelector("#qpag").addEventListener("input",e=>{NEG.pag=parseFloat(e.target.value)||0; updateQuick(); renderAll();});
+  c.querySelectorAll("#qdest .sgb").forEach(b=>b.addEventListener("click",()=>{NEG.dest=b.dataset.dest; c.querySelectorAll("#qdest .sgb").forEach(x=>x.classList.toggle("active",x.dataset.dest===NEG.dest)); updateQuick(); renderAll();}));
   updateQuick();
 }
 function updateQuick(){
@@ -520,7 +522,9 @@ function updateQuick(){
   const mercado=vlook(NEG.ent,tbl); const margen=R.indif-mercado; const cierra=mercado<=R.indif;
   const S=(id,v)=>{const e=document.getElementById(id); if(e)e.innerHTML=v;};
   S("qmax", f0(R.indif)+" <span style='font-size:15px'>/kg</span>");
-  S("qsub", NEG.categ+" · "+Math.round(NEG.ent)+" → "+Math.round(R.salef)+" kg · transferencia");
+  const dst={INVERNADA:"invernada",FAENA:"faena",TRANSFERENCIA:"transferencia"}[NEG.dest]||String(NEG.dest).toLowerCase();
+  const modo=PARAMS.modoCampo==="Capitalización"?" · capitalización":"";
+  S("qsub", NEG.categ+" · "+Math.round(NEG.ent)+" → "+Math.round(R.salef)+" kg · "+dst+modo);
   S("qmercado", f0(mercado)+" /kg"); { const bd=bandOf(NEG.ent,tbl); const qr=document.getElementById("qrango"); if(qr) qr.innerHTML=(bd&&bd[2]!=null)?("rango "+f0(bd[3])+"–"+f0(bd[2])):""; }
   const qm=document.getElementById("qmargen"); if(qm){qm.innerHTML=f0p(margen)+" /kg"; qm.style.color=cierra?"var(--verde)":"var(--rojo)";}
   const qc=document.getElementById("qcierra"); if(qc){qc.innerHTML=cierra?"✓ A precio de mercado de hoy, la compra cierra":"✗ A precio de mercado de hoy, está caro"; qc.style.color=cierra?"var(--verde)":"var(--rojo)";}

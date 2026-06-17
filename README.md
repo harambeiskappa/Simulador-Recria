@@ -82,7 +82,7 @@ La app lee `precios.json` al abrir y actualiza la pizarra y los parámetros de m
 - Hosteada en **GitHub Pages**, instalable en iPhone/Android (pantalla completa, offline).
 - **Service worker v4 "red primero"** para el index → las actualizaciones entran solas al reabrir (no hace falta reinstalar).
 - **Flujo de actualización**: editar archivos → **Commit + Push** (GitHub Desktop) → la app se actualiza sola.
-- **Modo Feria** (rápido: peso + categoría → máximo a pagar) y **modo Completo** (simulador completo).
+- **Modo Feria** (rápido: categoría + peso + destino → máximo a pagar, con rango máx/mín de la categoría) y **modo Completo** (simulador completo). El modo Feria refleja el destino y el modo de campo configurados.
 - Botón **Generar informe (PDF)**: arma un informe de una carilla con el estilo de la app y lo comparte como archivo.
 - Pestañas: **Simulador** y **Detalle del cálculo** (listas). **Análisis de compras** y **Sensibilidad** están **en revisión** (dependen de parámetros sin validar / datos de prueba).
 

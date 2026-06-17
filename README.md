@@ -251,12 +251,12 @@ Código sin referencias rotas y JS válido. Tests del modelo: break-even = 0; in
 
 ## Registro de cambios (changelog)
 
-Cada modificación de la app se anota acá (la más nueva arriba).
+La versión actual se muestra en la cabecera de la app (`v1.x`). La más nueva, arriba.
 
-- **17/06/2026 (3)** — Sección "Pendientes / próximos pasos (roadmap)" en el README (auto-update de precios, validación con Nico, input de Lolo, sync de Mis lotes, app standalone).
-- **17/06/2026 (2)** — Defaults más realistas (carga 3 cab/ha, días de suministro 30) + aviso "resultados preliminares". Pestaña Sensibilidad reconvertida: tabla de indiferencia según carga × suplementación (a qué carga cierra), salió de "en revisión". Exportar "Mis lotes" a CSV. Mismos defaults en el Excel.
-- **17/06/2026** — Capturas + guía de instalación + changelog en el README. Documentación técnica completa y auditoría integral. KPIs jerarquizados (3 principales + "ver más"). "Guardar lote" + pestaña "Mis lotes" (registro en el dispositivo) reemplazando la demo "Análisis de compras". Modo Feria con selector de destino y rango máx/mín de Entre Surcos. Parámetros básicos/avanzados. Informe PDF con estilo de la app. Pizarra `precios.json` por banda [peso, prom, máx, mín] + tipo de cambio y novillo arrendamiento.
-- **16/06/2026** — Cascada de costo por hectárea (verdeos voleo/avión + pasturas + mantenimiento + alquiler), dieta de 3 insumos (maíz/silo/núcleo) con markup y días de suministro, modos Alquiler/Capitalización, mortandad por ciclo + desbaste. Pizarra cambiada a Entre Surcos y Corrales. App PWA instalable (GitHub Pages) con service worker.
+- **v1.3** (17/06/2026) — Versión visible en la app + botón **Actualizar** (fuerza el chequeo de nueva versión en apps ya instaladas); **aviso de pizarra desactualizada** (si tiene más de 10 días); **recuerda los últimos datos** cargados (localStorage); **atajos de peso** en modo Feria.
+- **v1.2** (17/06/2026) — Capturas + guía de instalación + documentación técnica + roadmap en el README. Defaults realistas (carga 3, suplementación 30 días) + aviso "preliminar". Sensibilidad reconvertida (indiferencia según carga × suplementación). Exportar "Mis lotes" a CSV.
+- **v1.1** (17/06/2026) — Modo Feria (categoría/peso/destino → máximo a pagar) con rango máx/mín; parámetros básicos/avanzados; informe PDF; KPIs jerarquizados; "Guardar lote" + pestaña "Mis lotes" (reemplaza la demo "Análisis de compras").
+- **v1.0** (16/06/2026) — Base: cascada de costo por hectárea (verdeos voleo/avión + pasturas + mantenimiento + alquiler), dieta de 3 insumos con markup y días de suministro, modos Alquiler/Capitalización, mortandad por ciclo + desbaste, pizarra Entre Surcos, PWA instalable (GitHub Pages).
 
 ---
 
@@ -264,4 +264,4 @@ Cada modificación de la app se anota acá (la más nueva arriba).
 
 **Este README se actualiza con cada cambio del simulador** (qué se agrega, saca o modifica). Es la base de contexto para retomar el trabajo y para asistentes de IA (Copilot). Mantenerlo al día es obligatorio.
 
-_Última actualización: 17/06/2026 — sección Capturas + guía de instalación (iOS/Android/PC) + changelog; documentación técnica completa (modelo, datos, funciones, PWA, notas para standalone) + auditoría integral; KPIs jerarquizados (3 principales visibles + "Ver más indicadores"); "Guardar lote" + pestaña "Mis lotes" (registro en el dispositivo) reemplazando la "Análisis de compras" de prueba; selector de destino en modo Feria con rango máx/mín de Entre Surcos; parámetros básicos/avanzados; informe PDF; cascada por hectárea; dieta de 3 insumos; modos alquiler/capitalización. La pizarra (`precios.json`) guarda por banda [peso, prom, máx, mín]._
+_Versión actual: **v1.3**. Cambios registrados por versión en el changelog. Última actualización: 17/06/2026 — versionado + botón Actualizar + aviso pizarra vieja + recordar datos + atajos de peso. (Histórico: sección Capturas + guía de instalación (iOS/Android/PC) + changelog; documentación técnica completa (modelo, datos, funciones, PWA, notas para standalone) + auditoría integral; KPIs jerarquizados (3 principales visibles + "Ver más indicadores"); "Guardar lote" + pestaña "Mis lotes" (registro en el dispositivo) reemplazando la "Análisis de compras" de prueba; selector de destino en modo Feria con rango máx/mín de Entre Surcos; parámetros básicos/avanzados; informe PDF; cascada por hectárea; dieta de 3 insumos; modos alquiler/capitalización. La pizarra (`precios.json`) guarda por banda [peso, prom, máx, mín].)_

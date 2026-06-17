@@ -158,6 +158,9 @@ table{border-collapse:collapse;width:100%;font-size:13px}
 .sgb{flex:1;border:none;background:transparent;color:var(--muted);font-weight:700;font-size:13.5px;padding:9px;border-radius:6px;cursor:pointer}
 .sgb.active{background:var(--green2);color:#fff}
 .prelim{font-size:11.5px;color:#7a4f08;background:var(--ambar-bg);border:1px solid #e7d4a3;border-radius:8px;padding:8px 12px;margin-bottom:14px}
+.qchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.qchip{border:1px solid var(--line);background:var(--panel);color:var(--green2);font-size:12.5px;font-weight:700;padding:6px 11px;border-radius:18px;cursor:pointer}
+.qchip:hover{background:var(--green2);color:#fff;border-color:var(--green2)}
 .field-help{font-size:10.5px;color:var(--muted);line-height:1.4;margin:-2px 0 10px;padding-left:2px}
 .morekpi{margin-top:10px}
 .morekpi>summary{cursor:pointer;list-style:none;font-size:12px;font-weight:700;color:var(--muted);display:flex;align-items:center;gap:6px;padding:8px 2px}
@@ -178,7 +181,7 @@ table{border-collapse:collapse;width:100%;font-size:13px}
     <div><h1>Simulador de Recría</h1>
       <div class="sub">Darwash SA · Feedlot El Aras · evaluación de compras por indiferencia</div></div>
   </div>
-  <div style="display:flex;align-items:center;gap:12px"><div class="meta">Engorde a campo · v1<br>Pizarra: <span id="pizFecha">—</span></div><button id="gearBtn" class="gear" aria-label="Abrir parámetros">⚙ Parámetros</button></div>
+  <div style="display:flex;align-items:center;gap:9px"><div class="meta">Engorde a campo · <span id="appVer">v1.3</span><br>Pizarra: <span id="pizFecha">—</span></div><button class="gear" onclick="checkUpdate()" aria-label="Buscar actualización" title="Buscar actualización" style="padding:8px 12px">↻</button><button id="gearBtn" class="gear" aria-label="Abrir parámetros">⚙ Parámetros</button></div>
 </header>
 <div class="tabs">
   <div class="tab active" data-v="sim">Simulador</div>
@@ -242,6 +245,7 @@ table{border-collapse:collapse;width:100%;font-size:13px}
 </div>
 </div>
 <script>
+const APP_VER="v1.3";
 /* ===== PRECIOS-INICIO (lo actualiza la tarea diaria) ===== */
 const PIZ_FECHA="16/06/2026 · Entre Surcos y Corrales";
 const PIZ={
@@ -502,6 +506,7 @@ function renderQuick(){
        <div><label class="qlb">Categoría</label><div class="seg" id="qcat">${["Machos","Hembras"].map(o=>`<button class="sgb ${NEG.categ===o?'active':''}" data-cat="${o}">${o}</button>`).join("")}</div></div>
        <div><label class="qlb">Peso de ingreso</label><div class="qinput"><input id="qpeso" class="num" type="number" step="5" value="${Math.round(NEG.ent)}"><span class="qu">kg</span></div></div>
      </div>
+     <div class="qchips"><button class="qchip" data-w="140">140</button><button class="qchip" data-w="160">160</button><button class="qchip" data-w="180">180</button><button class="qchip" data-w="200">200</button><button class="qchip" data-w="220">220</button><button class="qchip" data-w="240">240</button><button class="qchip" data-w="260">260</button></div>
      <div style="margin-top:13px"><label class="qlb">Destino de salida</label><div class="seg" id="qdest">${[["TRANSFERENCIA","Transferencia"],["INVERNADA","Invernada"],["FAENA","Faena"]].map(d=>`<button class="sgb ${NEG.dest===d[0]?'active':''}" data-dest="${d[0]}">${d[1]}</button>`).join("")}</div></div>
      <div style="margin-top:16px;text-align:center;background:var(--green);color:#fff;border-radius:12px;padding:18px 16px">
        <div style="font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:#bcd2c4">Máximo a pagar (indiferencia)</div>
@@ -522,6 +527,7 @@ function renderQuick(){
    </div>`;
   c.querySelectorAll("#qcat .sgb").forEach(b=>b.addEventListener("click",()=>{NEG.categ=b.dataset.cat; c.querySelectorAll("#qcat .sgb").forEach(x=>x.classList.toggle("active",x.dataset.cat===NEG.categ)); updateQuick(); renderAll();}));
   c.querySelector("#qpeso").addEventListener("input",e=>{NEG.ent=parseFloat(e.target.value)||0; updateQuick(); renderAll();});
+  c.querySelectorAll(".qchip").forEach(b=>b.addEventListener("click",()=>{NEG.ent=+b.dataset.w; const qp=c.querySelector("#qpeso"); if(qp)qp.value=NEG.ent; updateQuick(); renderAll();}));
   c.querySelector("#qpag").addEventListener("input",e=>{NEG.pag=parseFloat(e.target.value)||0; updateQuick(); renderAll();});
   c.querySelectorAll("#qdest .sgb").forEach(b=>b.addEventListener("click",()=>{NEG.dest=b.dataset.dest; c.querySelectorAll("#qdest .sgb").forEach(x=>x.classList.toggle("active",x.dataset.dest===NEG.dest)); updateQuick(); renderAll();}));
   updateQuick();
@@ -541,7 +547,18 @@ function updateQuick(){
   const qv=document.getElementById("qverdict");
   if(qv){ if(NEG.pag>0){ const buena=NEG.pag<=R.indif; qv.innerHTML=`<div style='text-align:center;font-weight:800;font-size:15px;color:${buena?"var(--verde)":"var(--rojo)"}'>${buena?"✓ VERDE — "+f0(R.indif-NEG.pag)+" por debajo":"✗ ROJO — "+f0(NEG.pag-R.indif)+" de más"}</div>`; } else qv.innerHTML=""; }
 }
+function checkUpdate(){
+  try{ if("serviceWorker" in navigator){ navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.update();});}); } }catch(e){}
+  setTimeout(function(){ location.reload(); },500);
+}
+function setPizFecha(str){
+  const el=document.getElementById("pizFecha"); if(!el)return; el.textContent=str;
+  try{ const mm=String(str).match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/); if(mm){ const d=new Date(+mm[3],+mm[2]-1,+mm[1]); const dias=Math.floor((Date.now()-d.getTime())/86400000); if(dias>10){ el.innerHTML=str+' <span style="color:#ffd27a">· ⚠ '+dias+' días</span>'; } } }catch(e){}
+}
+function loadState(){ try{ const s=JSON.parse(localStorage.getItem("recriaEstado")||"null"); if(s){ if(s.NEG)Object.assign(NEG,s.NEG); if(s.PARAMS)Object.assign(PARAMS,s.PARAMS); } }catch(e){} }
+function persistState(){ try{ localStorage.setItem("recriaEstado",JSON.stringify({NEG:NEG,PARAMS:PARAMS})); }catch(e){} }
 function renderAll(){
+  persistState();
   const R=calc(NEG,PARAMS), ok=R.estado==="Buena";
   if(R.kgp<=0){
     document.getElementById("resultBox").innerHTML='<div class="result bad"><div class="tag">⚠ Revisá los pesos</div><div class="desc" style="margin-top:6px">El peso de salida debe ser mayor al de ingreso.</div></div>';
@@ -706,7 +723,7 @@ document.querySelectorAll(".fbtn").forEach(b=>b.addEventListener("click",()=>{
   document.querySelectorAll(".fbtn").forEach(x=>x.classList.remove("active"));
   b.classList.add("active"); BTFILTER=b.dataset.f; renderBacktest();
 }));
-document.getElementById("pizFecha").textContent=PIZ_FECHA;
+setPizFecha(PIZ_FECHA); (function(){var a=document.getElementById("appVer"); if(a)a.textContent=APP_VER;})();
 document.querySelectorAll(".mt").forEach(b=>b.addEventListener("click",()=>setMode(b.dataset.m)));
 setTimeout(()=>setMode("rapido"),0);
 function renderComercial(){
@@ -721,8 +738,9 @@ function renderComercial(){
     renderAll();
   }));
 }
+loadState();
 renderNegocio(); renderParams(); renderComercial(); renderAll();
-try{ fetch("precios.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(j=>{ if(!j)return; ["machos","hembras","rosgan","novillo","maiz"].forEach(k=>{ if(j[k]!=null) PIZ[k]=j[k]; }); if(j.tcUSD!=null) PARAMS.tcUSD=j.tcUSD; if(j.novilloArr!=null) PARAMS.alqNov=j.novilloArr; if(typeof renderParams==="function") renderParams(); if(typeof renderAll==="function") renderAll(); if(typeof updateQuick==="function") updateQuick(); }).catch(function(){}); }catch(e){}
+try{ fetch("precios.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(j=>{ if(!j)return; ["machos","hembras","rosgan","novillo","maiz"].forEach(k=>{ if(j[k]!=null) PIZ[k]=j[k]; }); if(j.tcUSD!=null) PARAMS.tcUSD=j.tcUSD; if(j.novilloArr!=null) PARAMS.alqNov=j.novilloArr; if(j.fecha && typeof setPizFecha==="function") setPizFecha(j.fecha); if(typeof renderParams==="function") renderParams(); if(typeof renderAll==="function") renderAll(); if(typeof updateQuick==="function") updateQuick(); }).catch(function(){}); }catch(e){}
 </script>
 <script>
 if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){});});}

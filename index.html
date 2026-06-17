@@ -159,6 +159,9 @@ table{border-collapse:collapse;width:100%;font-size:13px}
 .sgb.active{background:var(--green2);color:#fff}
 .qmini{flex:1;min-width:130px;background:var(--bg);border-radius:9px;padding:10px 13px}
 .qmini .l{font-size:11px;color:var(--muted)}.qmini .v{font-size:16px;font-weight:800;margin-top:2px}
+.qinput{position:relative;display:flex;align-items:center}
+.qinput input{width:100%;text-align:center;font-size:17px;font-weight:700;padding-right:42px}
+.qinput .qu{position:absolute;right:12px;font-size:12px;color:var(--muted);font-weight:600;pointer-events:none}
 </style>
 </head>
 <body>
@@ -178,7 +181,7 @@ table{border-collapse:collapse;width:100%;font-size:13px}
 </div>
 <div class="wrap">
 <div class="view active" id="sim">
-  <div class="modetoggle"><button class="mt active" data-m="rapido">⚡ Rápido</button><button class="mt" data-m="completo">Completo</button></div>
+  <div class="modetoggle"><button class="mt active" data-m="rapido">⚡ Feria</button><button class="mt" data-m="completo">Completo</button></div>
   <div id="quickPanel"></div>
   <div id="fullPanel" hidden>
   <div class="secttl">1 · Cargá los datos</div>
@@ -487,7 +490,7 @@ function renderQuick(){
    <div class="card" style="padding:18px">
      <div class="qrow">
        <div><label class="qlb">Categoría</label><div class="seg" id="qcat">${["Machos","Hembras"].map(o=>`<button class="sgb ${NEG.categ===o?'active':''}" data-cat="${o}">${o}</button>`).join("")}</div></div>
-       <div><label class="qlb">Peso de ingreso (kg)</label><input id="qpeso" class="num" type="number" step="5" value="${Math.round(NEG.ent)}"></div>
+       <div><label class="qlb">Peso de ingreso</label><div class="qinput"><input id="qpeso" class="num" type="number" step="5" value="${Math.round(NEG.ent)}"><span class="qu">kg</span></div></div>
      </div>
      <div style="margin-top:16px;text-align:center;background:var(--green);color:#fff;border-radius:12px;padding:18px 16px">
        <div style="font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:#bcd2c4">Máximo a pagar (indiferencia)</div>
@@ -500,8 +503,8 @@ function renderQuick(){
      </div>
      <div id="qcierra" style="margin-top:11px;font-size:13px;font-weight:700;text-align:center"></div>
      <div style="margin-top:14px;border-top:1px solid var(--line);padding-top:13px">
-       <label class="qlb">¿Cuánto te piden? ($/kg) — opcional</label>
-       <input id="qpag" class="num" type="number" step="10" value="${NEG.pag||''}">
+       <label class="qlb">¿Cuánto te piden? <span style="color:var(--muted);font-weight:400">(opcional)</span></label>
+       <div class="qinput"><input id="qpag" class="num" type="number" step="10" placeholder="—" value="${NEG.pag||''}"><span class="qu">$/kg</span></div>
        <div id="qverdict" style="margin-top:9px"></div>
      </div>
    </div>`;

@@ -38,6 +38,11 @@ header .meta{font-size:11px;color:#bcd2c4;text-align:right}
 .tab{padding:13px 18px;font-size:13.5px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2.5px solid transparent;transition:.15s;user-select:none}
 .tab:hover{color:var(--ink)}
 .tab.active{color:var(--green2);border-bottom-color:var(--accent)}
+.tab.wip{opacity:.6}
+.tab.wip.active{opacity:1}
+.tab .wip-tag{font-size:9px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;background:var(--ambar-bg);color:var(--ambar);border:1px solid #e7d4a3;border-radius:6px;padding:1px 5px;margin-left:6px;vertical-align:middle}
+.wip-banner{background:var(--ambar-bg);border:1px solid #e7d4a3;border-left:4px solid var(--ambar);border-radius:0 10px 10px 0;padding:11px 15px;margin-bottom:14px;font-size:13px;color:#7a4f08}
+.wip-banner b{color:var(--ambar)}
 .wrap{max-width:1180px;margin:0 auto;padding:24px 30px 60px}
 .view{display:none}.view.active{display:block}
 .grid2{display:grid;grid-template-columns:1.05fr 1fr;gap:20px;align-items:start}
@@ -145,8 +150,8 @@ table{border-collapse:collapse;width:100%;font-size:13px}
 <div class="tabs">
   <div class="tab active" data-v="sim">Simulador</div>
   <div class="tab" data-v="det">Detalle del cálculo</div>
-  <div class="tab" data-v="bt">Análisis de compras</div>
-  <div class="tab" data-v="sens">Sensibilidad</div>
+  <div class="tab wip" data-v="bt">Análisis de compras <span class="wip-tag">en revisión</span></div>
+  <div class="tab wip" data-v="sens">Sensibilidad <span class="wip-tag">en revisión</span></div>
 </div>
 <div class="wrap">
 <div class="view active" id="sim">
@@ -172,6 +177,7 @@ table{border-collapse:collapse;width:100%;font-size:13px}
   <div class="bd"><div class="dcols" id="detalle"></div></div></div>
 </div>
 <div class="view" id="bt">
+  <div class="wip-banner"><b>Sección en revisión.</b> Funciona, pero usa datos de una feria de prueba y depende de parámetros aún sin validar con Nico. Resultados preliminares.</div>
   <div class="flag"><b>Análisis de compras del grupo · por feria.</b> Solo lotes con destino invernada comprados por el grupo (Bulltrade, Las Taperas del Oeste, Union Ganadera, Pecuaria Garabi/PEGSA). La indiferencia usa los parámetros actuales — si cambiás la tasa o los costos, esto se actualiza. Se agregan más ferias al cargar sus planillas.</div>
   <div class="bsum" id="btsum"></div>
   <div class="filterbar">
@@ -186,6 +192,7 @@ table{border-collapse:collapse;width:100%;font-size:13px}
   <div class="note">Pagado = columna "$VENTA" de la planilla (nuestra compra). Indiferencia con destino transferencia, ~5 meses. Preliminar: depende de los supuestos a validar.</div>
 </div>
 <div class="view" id="sens">
+  <div class="wip-banner"><b>Sección en revisión.</b> El cálculo anda, pero los techos de compra dependen de la carga y la suplementación todavía sin confirmar. Tomar como orientativo.</div>
   <div class="flag"><b>Sensibilidad para la feria.</b> Cuánto es lo máximo que conviene pagar por kg según el peso del ternero, y cómo cambia ese techo con la tasa. Verde = al precio de mercado de hoy la compra cierra; rojo = está caro.</div>
   <div class="card"><div class="hd"><span class="pin"></span>Precio máximo a pagar por peso de ingreso</div>
   <div class="bd"><div class="btbl"><table id="sensA"></table></div>

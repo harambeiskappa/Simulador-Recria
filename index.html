@@ -177,6 +177,9 @@ html.dark{--bg:#0e1512;--panel:#16211c;--ink:#e9efea;--muted:#93a39a;--line:#283
 html.dark .field input,html.dark .field select,html.dark .qinput input{background:#0e1714;border-color:var(--line)}
 html.dark .qinput input{color:var(--ink)}
 html.dark select option{background:#16211c;color:var(--ink)}
+html.dark .btbl th{background:#1b2620}
+html.dark .kpi.star{background:#16211c;border-color:var(--verde-bd)}
+html.dark .flag,html.dark .wip-banner{color:var(--ambar)}
 #formNegocio input,#formNegocio select,#quickPanel input,#quickPanel select{font-size:16px}
 </style>
 </head>
@@ -187,7 +190,7 @@ html.dark select option{background:#16211c;color:var(--ink)}
     <div><h1>Simulador de Recría</h1>
       <div class="sub">Darwash SA · Feedlot El Aras · evaluación de compras por indiferencia</div></div>
   </div>
-  <div style="display:flex;align-items:center;gap:9px"><div class="meta">Engorde a campo · <span id="appVer">v1.4.1</span><br>Pizarra: <span id="pizFecha">—</span></div><button class="gear" id="themeBtn" onclick="toggleTheme()" aria-label="Cambiar tema" title="Claro / oscuro" style="padding:8px 11px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button><button class="gear" onclick="checkUpdate()" aria-label="Buscar actualización" title="Buscar actualización" style="padding:8px 12px">↻</button><button id="gearBtn" class="gear" aria-label="Abrir parámetros">⚙ Parámetros</button></div>
+  <div style="display:flex;align-items:center;gap:9px"><div class="meta">Engorde a campo · <span id="appVer">v1.4.2</span><br>Pizarra: <span id="pizFecha">—</span></div><button class="gear" id="themeBtn" onclick="toggleTheme()" aria-label="Cambiar tema" title="Claro / oscuro" style="padding:8px 11px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button><button class="gear" onclick="checkUpdate()" aria-label="Buscar actualización" title="Buscar actualización" style="padding:8px 12px">↻</button><button id="gearBtn" class="gear" aria-label="Abrir parámetros">⚙ Parámetros</button></div>
 </header>
 <div class="tabs">
   <div class="tab active" data-v="sim">Simulador</div>
@@ -251,7 +254,7 @@ html.dark select option{background:#16211c;color:var(--ink)}
 </div>
 </div>
 <script>
-const APP_VER="v1.4.1";
+const APP_VER="v1.4.2";
 (function(){try{var t=localStorage.getItem("recriaTheme");if(t==="dark"||(!t&&window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches))document.documentElement.classList.add("dark");}catch(e){}})();
 /* ===== PRECIOS-INICIO (lo actualiza la tarea diaria) ===== */
 const PIZ_FECHA="16/06/2026 · Entre Surcos y Corrales";

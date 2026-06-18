@@ -253,6 +253,7 @@ Código sin referencias rotas y JS válido. Tests del modelo: break-even = 0; in
 
 La versión actual se muestra en la cabecera de la app (`v1.x`). La más nueva, arriba.
 
+- **v1.4.3** (17/06/2026) — Fix del gráfico de la pizarra y el medidor en modo oscuro (el área bajo la curva y el fondo de la grilla tenían color claro fijo); ahora se adaptan al tema y se refrescan al cambiar de modo.
 - **v1.4.2** (17/06/2026) — Más fixes de contraste en modo oscuro: encabezados de tablas, tarjetas de indicadores destacadas y el texto de los carteles informativos tenían fondo/color claro fijo; ahora se adaptan al tema oscuro.
 - **v1.4.1** (17/06/2026) — Fix de contraste: en modo oscuro los desplegables (selects) tenían el texto casi invisible (fondo claro fijo). Los campos ahora usan fondo oscuro y texto legible en modo oscuro.
 - **v1.4** (17/06/2026) — **Modo oscuro** (botón en la cabecera, recuerda la preferencia y respeta la del sistema) + ajustes de legibilidad (inputs a 16px para evitar el zoom del celular y leer mejor).

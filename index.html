@@ -52,7 +52,7 @@ header .meta{font-size:11px;color:#bcd2c4;text-align:right}
 .card .hd{padding:14px 18px;border-bottom:1px solid var(--line);font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--green2);display:flex;align-items:center;gap:8px}
 .card .bd{padding:16px 18px}
 .card .hd .pin{width:7px;height:7px;border-radius:50%;background:var(--accent)}
-.field{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid #eef2ee}
+.field{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid ${document.documentElement.classList.contains("dark")?"#243029":"#eef2ee"}}
 .field:last-child{border-bottom:none}
 .field label{font-size:13px;color:var(--ink);font-weight:500}
 .field .u{font-size:11px;color:var(--muted);margin-left:5px;font-weight:400}
@@ -104,7 +104,7 @@ details.params[open]>summary .ch{transform:rotate(180deg)}
 .pgrid .field input,.pgrid .field select{width:120px}
 .pgrid .sechead{grid-column:1/-1;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);padding:12px 0 4px;border-bottom:1px solid var(--line);margin-bottom:2px}
 table{border-collapse:collapse;width:100%;font-size:13px}
-.dt td{padding:7px 4px;border-bottom:1px solid #eef2ee}
+.dt td{padding:7px 4px;border-bottom:1px solid var(--line)}
 .dt td:last-child{text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
 .dt tr.sub td{color:var(--muted);font-size:12px}
 .dt tr.tot td{font-weight:800;border-top:2px solid var(--line);border-bottom:none;padding-top:10px}
@@ -120,7 +120,7 @@ table{border-collapse:collapse;width:100%;font-size:13px}
 .btbl table{font-size:12.5px}
 .btbl th{background:#f7f9f6;font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:700;padding:9px 12px;text-align:right;border-bottom:1px solid var(--line)}
 .btbl th.l,.btbl td.l{text-align:left}
-.btbl td{padding:8px 12px;text-align:right;border-bottom:1px solid #eef2ee;font-variant-numeric:tabular-nums}
+.btbl td{padding:8px 12px;text-align:right;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
 .btbl tr:last-child td{border-bottom:none}
 .pill{font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:6px}
 .pill.ok{background:var(--verde-bg);color:var(--verde)}.pill.bad{background:var(--rojo-bg);color:var(--rojo)}
@@ -190,7 +190,7 @@ html.dark .flag,html.dark .wip-banner{color:var(--ambar)}
     <div><h1>Simulador de Recría</h1>
       <div class="sub">Darwash SA · Feedlot El Aras · evaluación de compras por indiferencia</div></div>
   </div>
-  <div style="display:flex;align-items:center;gap:9px"><div class="meta">Engorde a campo · <span id="appVer">v1.4.2</span><br>Pizarra: <span id="pizFecha">—</span></div><button class="gear" id="themeBtn" onclick="toggleTheme()" aria-label="Cambiar tema" title="Claro / oscuro" style="padding:8px 11px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button><button class="gear" onclick="checkUpdate()" aria-label="Buscar actualización" title="Buscar actualización" style="padding:8px 12px">↻</button><button id="gearBtn" class="gear" aria-label="Abrir parámetros">⚙ Parámetros</button></div>
+  <div style="display:flex;align-items:center;gap:9px"><div class="meta">Engorde a campo · <span id="appVer">v1.4.3</span><br>Pizarra: <span id="pizFecha">—</span></div><button class="gear" id="themeBtn" onclick="toggleTheme()" aria-label="Cambiar tema" title="Claro / oscuro" style="padding:8px 11px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button><button class="gear" onclick="checkUpdate()" aria-label="Buscar actualización" title="Buscar actualización" style="padding:8px 12px">↻</button><button id="gearBtn" class="gear" aria-label="Abrir parámetros">⚙ Parámetros</button></div>
 </header>
 <div class="tabs">
   <div class="tab active" data-v="sim">Simulador</div>
@@ -254,7 +254,7 @@ html.dark .flag,html.dark .wip-banner{color:var(--ambar)}
 </div>
 </div>
 <script>
-const APP_VER="v1.4.2";
+const APP_VER="v1.4.3";
 (function(){try{var t=localStorage.getItem("recriaTheme");if(t==="dark"||(!t&&window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches))document.documentElement.classList.add("dark");}catch(e){}})();
 /* ===== PRECIOS-INICIO (lo actualiza la tarea diaria) ===== */
 const PIZ_FECHA="16/06/2026 · Entre Surcos y Corrales";
@@ -557,7 +557,7 @@ function updateQuick(){
   const qv=document.getElementById("qverdict");
   if(qv){ if(NEG.pag>0){ const buena=NEG.pag<=R.indif; qv.innerHTML=`<div style='text-align:center;font-weight:800;font-size:15px;color:${buena?"var(--verde)":"var(--rojo)"}'>${buena?"✓ VERDE — "+f0(R.indif-NEG.pag)+" por debajo":"✗ ROJO — "+f0(NEG.pag-R.indif)+" de más"}</div>`; } else qv.innerHTML=""; }
 }
-function toggleTheme(){ var d=document.documentElement.classList.toggle("dark"); try{localStorage.setItem("recriaTheme",d?"dark":"light");}catch(e){} }
+function toggleTheme(){ var d=document.documentElement.classList.toggle("dark"); try{localStorage.setItem("recriaTheme",d?"dark":"light");}catch(e){} if(typeof renderAll==="function")renderAll(); if(typeof updateQuick==="function")updateQuick(); }
 function checkUpdate(){
   try{ if("serviceWorker" in navigator){ navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.update();});}); } }catch(e){}
   setTimeout(function(){ location.reload(); },500);
@@ -617,7 +617,7 @@ function gaugeSVG(pag,indif){
   const col=pag<=indif?'var(--verde)':'var(--rojo)';
   return `
   <div style="margin-top:16px;position:relative;height:30px">
-    <div style="position:absolute;top:13px;left:0;right:0;height:7px;border-radius:4px;background:#eef2ee;overflow:hidden">
+    <div style="position:absolute;top:13px;left:0;right:0;height:7px;border-radius:4px;background:${document.documentElement.classList.contains("dark")?"#243029":"#eef2ee"};overflow:hidden">
       <div style="position:absolute;left:0;top:0;bottom:0;width:${xi}%;background:var(--verde);opacity:.45"></div>
       <div style="position:absolute;left:${xi}%;top:0;bottom:0;right:0;background:var(--rojo);opacity:.32"></div>
     </div>
@@ -640,6 +640,7 @@ function renderPiz(R){
 function chip(l,v){return `<div style="background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:7px 11px;flex:1;min-width:96px"><div style="font-size:10px;color:var(--muted)">${l}</div><div style="font-weight:700;font-size:13px" class="num">${v}</div></div>`;}
 function curveSVG(tbl,ent,exit){
   const W=680,H=300,PL=14,PR=14,PT=26,PB=42;
+  const dk=document.documentElement.classList.contains("dark");
   const ws=tbl.map(p=>p[0]), ps=tbl.map(p=>p[1]);
   const wmax=Math.max(...ws,exit)+20, pmin=Math.min(...ps)*0.96, pmax=Math.max(...ps)*1.03, pr=(pmax-pmin)||1;
   const X=w=>PL+(w/wmax)*(W-PL-PR), Y=p=>PT+(1-(p-pmin)/pr)*(H-PT-PB);
@@ -647,7 +648,7 @@ function curveSVG(tbl,ent,exit){
   const area=`${X(0).toFixed(1)},${Y(pmin).toFixed(1)} ${pts} ${X(ws[ws.length-1]).toFixed(1)},${Y(pmin).toFixed(1)}`;
   let grid="",ylab="";
   for(let i=0;i<4;i++){const p=pmin+pr*i/3, y=Y(p);
-    grid+=`<line x1="${PL}" y1="${y.toFixed(1)}" x2="${W-PR}" y2="${y.toFixed(1)}" stroke="#eef2ed" stroke-width="1"/>`;
+    grid+=`<line x1="${PL}" y1="${y.toFixed(1)}" x2="${W-PR}" y2="${y.toFixed(1)}" stroke="${dk?'#26332c':'#eef2ed'}" stroke-width="1"/>`;
     ylab+=`<text x="${PL+2}" y="${(y-4).toFixed(1)}" font-size="12.5" fill="#9aa39a">${f0(Math.round(p/100)*100)}</text>`;}
   let xlab="";[100,200,300,400].forEach(w=>{if(w<=wmax)xlab+=`<text x="${X(w).toFixed(1)}" y="${H-PB+22}" font-size="12.5" fill="#9aa39a" text-anchor="middle">${w} kg</text>`;});
   const mk=(w,col,lab)=>{const x=X(w),y=Y(vlook(w,tbl));
@@ -657,7 +658,7 @@ function curveSVG(tbl,ent,exit){
       +`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5.5" fill="${col}" stroke="#fff" stroke-width="2.5"/>`;};
   return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block;font-family:Inter,Arial">
     ${grid}
-    <polygon points="${area}" fill="#e3ede7"/>
+    <polygon points="${area}" fill="${dk?'rgba(95,209,154,.10)':'#e3ede7'}"/>
     <polyline points="${pts}" fill="none" stroke="var(--green2)" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
     ${ylab}${xlab}
     ${mk(ent,'var(--azul)','ingreso '+Math.round(ent))}

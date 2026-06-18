@@ -253,6 +253,7 @@ Código sin referencias rotas y JS válido. Tests del modelo: break-even = 0; in
 
 La versión actual se muestra en la cabecera de la app (`v1.x`). La más nueva, arriba.
 
+- **v1.4.1** (17/06/2026) — Fix de contraste: en modo oscuro los desplegables (selects) tenían el texto casi invisible (fondo claro fijo). Los campos ahora usan fondo oscuro y texto legible en modo oscuro.
 - **v1.4** (17/06/2026) — **Modo oscuro** (botón en la cabecera, recuerda la preferencia y respeta la del sistema) + ajustes de legibilidad (inputs a 16px para evitar el zoom del celular y leer mejor).
 - **v1.3** (17/06/2026) — Versión visible en la app + botón **Actualizar** (fuerza el chequeo de nueva versión en apps ya instaladas); **aviso de pizarra desactualizada** (si tiene más de 10 días); **recuerda los últimos datos** cargados (localStorage); **atajos de peso** en modo Feria.
 - **v1.2** (17/06/2026) — Capturas + guía de instalación + documentación técnica + roadmap en el README. Defaults realistas (carga 3, suplementación 30 días) + aviso "preliminar". Sensibilidad reconvertida (indiferencia según carga × suplementación). Exportar "Mis lotes" a CSV.

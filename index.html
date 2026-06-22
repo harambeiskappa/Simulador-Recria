@@ -190,7 +190,7 @@ html.dark .flag,html.dark .wip-banner{color:var(--ambar)}
     <div><h1>Simulador de Recría</h1>
       <div class="sub">Darwash SA · Feedlot El Aras · evaluación de compras por indiferencia</div></div>
   </div>
-  <div style="display:flex;align-items:center;gap:9px"><div class="meta">Engorde a campo · <span id="appVer">v1.4.3</span><br>Pizarra: <span id="pizFecha">—</span></div><button class="gear" id="themeBtn" onclick="toggleTheme()" aria-label="Cambiar tema" title="Claro / oscuro" style="padding:8px 11px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button><button class="gear" onclick="checkUpdate()" aria-label="Buscar actualización" title="Buscar actualización" style="padding:8px 12px">↻</button><button id="gearBtn" class="gear" aria-label="Abrir parámetros">⚙ Parámetros</button></div>
+  <div style="display:flex;align-items:center;gap:9px"><div class="meta">Engorde a campo · <span id="appVer">v1.5</span><br>Pizarra: <span id="pizFecha">—</span></div><button class="gear" id="themeBtn" onclick="toggleTheme()" aria-label="Cambiar tema" title="Claro / oscuro" style="padding:8px 11px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button><button class="gear" onclick="checkUpdate()" aria-label="Buscar actualización" title="Buscar actualización" style="padding:8px 12px">↻</button><button id="gearBtn" class="gear" aria-label="Abrir parámetros">⚙ Parámetros</button></div>
 </header>
 <div class="tabs">
   <div class="tab active" data-v="sim">Simulador</div>
@@ -254,14 +254,14 @@ html.dark .flag,html.dark .wip-banner{color:var(--ambar)}
 </div>
 </div>
 <script>
-const APP_VER="v1.4.3";
+const APP_VER="v1.5";
 (function(){try{var t=localStorage.getItem("recriaTheme");if(t==="dark"||(!t&&window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches))document.documentElement.classList.add("dark");}catch(e){}})();
 /* ===== PRECIOS-INICIO (lo actualiza la tarea diaria) ===== */
-const PIZ_FECHA="16/06/2026 · Entre Surcos y Corrales";
+const PIZ_FECHA="20/06/2026 · maíz BCR 19/06 · invernada 16/06 Entre Surcos y Corrales";
 const PIZ={
   machos:[[0,7455,8242,4350],[100,6846,7719,5500],[130,6801,13448,5800],[160,6454,7341,5722],[180,6362,7198,5297],[200,6207,7050,4850],[230,5754,6400,4240],[260,5136,5750,4200],[300,4736,5161,4062],[330,4581,5050,4000],[370,4368,4675,4071],[400,4102,5620,3277]],
   hembras:[[0,6523,6588,6000],[100,6464,7500,4417],[130,6124,7185,5000],[150,5953,7742,5333],[170,5851,7000,4900],[190,5762,7129,4800],[210,5523,6800,4000],[250,4903,6770,4137],[290,4724,5267,3613],[320,4502,4925,3818],[390,3683,3800,3023]],
-  rosgan:4900, novillo:4133, maiz:254710
+  rosgan:4900, novillo:4133, maiz:259560
 };
 /* ===== PRECIOS-FIN ===== */
 /* ===== MIS LOTES (guardados en el dispositivo) ===== */
@@ -289,7 +289,7 @@ const PARAMS={aum:0.5,tasa:0.19,plzc:30,plzv:30,base:"Compra + Costos",mortc:0.0
   modoCampo:"Alquiler",pctCapt:0.30,sieMet:"Aéreo (voleo)",tcUSD:1446,semPr:0.65,labAv:30,labTe:40,semAv:55,semTe:40,pastImpl:368735,pastDur:4,mant:176900,alqKg:75,alqNov:4179,car:3.0,consMS:0.028,pctsupl:0.40,diasSupl:30,markupSupl:0.05,pMaiz:217761,pSilo:166257,pNucleo:409050,rMaiz:10,rSilo:85,rNucleo:5,msMaiz:87,msSilo:50,msNucleo:97.5,hotel:0,san:7500,comc:0.03,comv:0.03,gui:1725,desb:0,desbv:0.05,deco:0,
   tarifa:3000,cfijo:0,jcomp:12000,jvent:19000,ivavh:0.105,ivach:0.105,ivaf:0.21,ivas:0.21,mni:224000,alic:0.02};
 const NEG={categ:"Machos",modo:"Por días",ent:180,sal:330,dias_in:150,pag:6556,objcab:0,
-  dest:"TRANSFERENCIA",fuente:"CACG por kilo",psalin:4800,rinde:0.52,kmi:150,kms:640};
+  dest:"TRANSFERENCIA",fuente:"Entre Surcos (por kg)",psalin:4800,rinde:0.52,kmi:150,kms:640};
 function calc(N,P){
   const tbl=N.categ==="Machos"?PIZ.machos:PIZ.hembras;
   const dias=N.modo==="Por días"?N.dias_in:(N.sal-N.ent)/P.aum;
@@ -354,7 +354,7 @@ function renderNegocio(){
   h+=inp("pag","Precio pagado","$/kg vivo",NEG.pag,10);
   h+=inp("objcab","Objetivo resultado","$/cab",NEG.objcab,10000);
   h+=sel("dest","Destino de salida",["INVERNADA","FAENA","TRANSFERENCIA"],NEG.dest);
-  if(showFuente) h+=sel("fuente","Fuente precio salida",["CACG por kilo","ROSGAN índice","Manual"],NEG.fuente);
+  if(showFuente) h+=sel("fuente","Fuente precio salida",["Entre Surcos (por kg)","ROSGAN índice","Manual"],NEG.fuente);
   if(showPsal) h+=inp("psalin","Precio de salida",NEG.dest==="FAENA"?"$/kg carne":"$/kg vivo",NEG.psalin,10);
   if(showRinde) h+=inp("rinde","Rinde","%",NEG.rinde*100,0.5);
   if(!showPsal) h+=`<div class="field"><label>↳ Precio de salida estimado<span class="u">$/kg vivo</span></label><span class="num" id="ventaAuto" style="font-weight:700;color:var(--accent)">—</span></div><div class="field-help">Valor del animal al salir, tomado de la pizarra (Entre Surcos) para ese peso. Es la "venta" con la que se compara la compra; baja al engordar.</div>`;
@@ -752,7 +752,13 @@ function renderComercial(){
 }
 loadState();
 renderNegocio(); renderParams(); renderComercial(); renderAll();
-try{ fetch("precios.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(j=>{ if(!j)return; ["machos","hembras","rosgan","novillo","maiz"].forEach(k=>{ if(j[k]!=null) PIZ[k]=j[k]; }); if(j.tcUSD!=null) PARAMS.tcUSD=j.tcUSD; if(j.novilloArr!=null) PARAMS.alqNov=j.novilloArr; if(j.fecha && typeof setPizFecha==="function") setPizFecha(j.fecha); if(typeof renderParams==="function") renderParams(); if(typeof renderAll==="function") renderAll(); if(typeof updateQuick==="function") updateQuick(); }).catch(function(){}); }catch(e){}
+try{ fetch("precios.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(j=>{ if(!j)return;
+  ["machos","hembras","rosgan","novillo","maiz"].forEach(k=>{ if(j[k]!=null) PIZ[k]=j[k]; });
+  ["tcUSD","pMaiz","pSilo","pNucleo"].forEach(k=>{ if(j[k]!=null) PARAMS[k]=j[k]; });
+  if(j.novilloArr!=null) PARAMS.alqNov=j.novilloArr;
+  if(j.fecha && typeof setPizFecha==="function") setPizFecha(j.fecha);
+  if(typeof renderParams==="function") renderParams(); if(typeof renderAll==="function") renderAll(); if(typeof updateQuick==="function") updateQuick();
+}).catch(function(){}); }catch(e){}
 </script>
 <script>
 if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){});});}

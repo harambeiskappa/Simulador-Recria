@@ -234,7 +234,7 @@ Clave `recriaLotes` → array de `{f (fecha), cat, ent, sal, dest, pag, indif, d
 `generateReport()` arma un nodo HTML con el estilo de la app → `html2canvas` (imagen) → `jsPDF` (A4) → `navigator.share` (archivo) o descarga.
 
 ### Auto-update (`precios.json`)
-`{ fecha, machos:[[peso,prom,máx,mín]…], hembras:[…], rosgan, novillo, novilloArr, tcUSD, maiz }`. La app lo lee al abrir (`fetch` no-store) y actualiza `PIZ` + `PARAMS.tcUSD` + `PARAMS.alqNov`.
+`{ fecha, machos:[[peso,prom,máx,mín]…], hembras:[…], rosgan, novillo, novilloArr, tcUSD, maiz, pMaiz, pSilo, pNucleo }`. La app lo lee al abrir (`fetch` no-store) y actualiza la pizarra (`PIZ`) **y** los parámetros de mercado (`tcUSD`, `alqNov` desde `novilloArr`, y los precios de la dieta `pMaiz`/`pSilo`/`pNucleo`). Es el único lugar donde se editan los precios.
 
 ### PWA
 `sw.js` (CACHE `recria-v4`): `index.html` y `precios.json` = **red-primero** (siempre lo último, cae a caché sin internet); resto = caché-primero con guardado oportunista (cachea jsPDF/html2canvas tras el primer uso). Al cambiar `index.html` no hace falta reinstalar; al cambiar `sw.js`, subir el número de versión.
@@ -253,6 +253,7 @@ Código sin referencias rotas y JS válido. Tests del modelo: break-even = 0; in
 
 La versión actual se muestra en la cabecera de la app (`v1.x`). La más nueva, arriba.
 
+- **v1.5** (18/06/2026) — Todos los precios desde un solo `precios.json`: ahora el feed también trae los insumos de la dieta (maíz puesto, silo, núcleo), no solo la pizarra. Editás un archivo y se actualiza todo (pizarra + costo de suplementación). La fuente de precio de salida pasó a llamarse **"Entre Surcos (por kg)"** (antes "CACG por kilo"), que es de donde sale.
 - **v1.4.3** (17/06/2026) — Fix del gráfico de la pizarra y el medidor en modo oscuro (el área bajo la curva y el fondo de la grilla tenían color claro fijo); ahora se adaptan al tema y se refrescan al cambiar de modo.
 - **v1.4.2** (17/06/2026) — Más fixes de contraste en modo oscuro: encabezados de tablas, tarjetas de indicadores destacadas y el texto de los carteles informativos tenían fondo/color claro fijo; ahora se adaptan al tema oscuro.
 - **v1.4.1** (17/06/2026) — Fix de contraste: en modo oscuro los desplegables (selects) tenían el texto casi invisible (fondo claro fijo). Los campos ahora usan fondo oscuro y texto legible en modo oscuro.
@@ -268,4 +269,4 @@ La versión actual se muestra en la cabecera de la app (`v1.x`). La más nueva, 
 
 **Este README se actualiza con cada cambio del simulador** (qué se agrega, saca o modifica). Es la base de contexto para retomar el trabajo y para asistentes de IA (Copilot). Mantenerlo al día es obligatorio.
 
-_Versión actual: **v1.4**. Cambios registrados por versión en el changelog. Última actualización: 17/06/2026 — modo oscuro + legibilidad. (Histórico: sección Capturas + guía de instalación (iOS/Android/PC) + changelog; documentación técnica completa (modelo, datos, funciones, PWA, notas para standalone) + auditoría integral; KPIs jerarquizados (3 principales visibles + "Ver más indicadores"); "Guardar lote" + pestaña "Mis lotes" (registro en el dispositivo) reemplazando la "Análisis de compras" de prueba; selector de destino en modo Feria con rango máx/mín de Entre Surcos; parámetros básicos/avanzados; informe PDF; cascada por hectárea; dieta de 3 insumos; modos alquiler/capitalización. La pizarra (`precios.json`) guarda por banda [peso, prom, máx, mín].)_
+_Versión actual: **v1.5**. Cambios registrados por versión en el changelog. Última actualización: 18/06/2026 — todos los precios unificados en `precios.json` + fuente renombrada "Entre Surcos (por kg)". (Histórico: sección Capturas + guía de instalación (iOS/Android/PC) + changelog; documentación técnica completa (modelo, datos, funciones, PWA, notas para standalone) + auditoría integral; KPIs jerarquizados (3 principales visibles + "Ver más indicadores"); "Guardar lote" + pestaña "Mis lotes" (registro en el dispositivo) reemplazando la "Análisis de compras" de prueba; selector de destino en modo Feria con rango máx/mín de Entre Surcos; parámetros básicos/avanzados; informe PDF; cascada por hectárea; dieta de 3 insumos; modos alquiler/capitalización. La pizarra (`precios.json`) guarda por banda [peso, prom, máx, mín].)_

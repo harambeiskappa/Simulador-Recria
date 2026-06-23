@@ -2,10 +2,13 @@
 
 App (PWA) para evaluar en la feria si conviene comprar un lote de terneros para **recría**, comparando el $/kg pagado contra el **precio de indiferencia** (punto de equilibrio).
 
-- **Verde** = se pagó por debajo de la indiferencia → buena compra.
-- **Rojo** = se pagó por encima → mala compra → reclamo a la feria.
+El semáforo tiene **tres niveles**, usando dos umbrales: la **indiferencia de equilibrio** (resultado cero) y la **indiferencia de recupero (µ)** (máximo a pagar para que además recupere el capital al ritmo del plazo fijo × µ):
 
-El criterio es **indiferencia**, NO un margen objetivo.
+- **Verde** = se pagó por debajo de la indiferencia de recupero → cierra **y** le gana al plazo fijo (×µ). Buena compra.
+- **Amarillo** = se pagó entre el recupero y el equilibrio → cierra, pero **no** le gana al plazo fijo (la plata rendiría parecido en un plazo fijo).
+- **Rojo** = se pagó por encima del equilibrio → mala compra → reclamo a la feria.
+
+El criterio es **indiferencia** (equilibrio + recupero de capital), NO un margen objetivo fijo.
 
 Vive en: https://harambeiskappa.github.io/Simulador-Recria/
 
@@ -167,7 +170,7 @@ Los datos provisorios se marcan con un asterisco `*`.
 
 ## Pendientes / próximos pasos (roadmap)
 
-- **Auto-update real de precios** (pendiente): GitHub Action programado que abra Entre Surcos con un navegador headless (la página renderiza con JS), lea las tablas y reescriba `precios.json` solo. Hoy el `precios.json` se actualiza a mano (Commit + Push).
+- **Auto-update real de precios** (pendiente): GitHub Action programado que lea las fuentes (Entre Surcos para hacienda, BCR maíz, Cañuelas novillo, dólar, y la **TNA de plazo fijo / FIMA**) y reescriba `precios.json` solo. Hoy el `precios.json` se actualiza a mano (Commit + Push). La **TNA FIMA** (tasa de plazo fijo, hoy ~19%) ya está en el feed; falta el scraping automático de la tasa vigente.
 - **Validación contra las simulaciones de Nico** (en pausa, esperando que las pase) — comparar resultado e indiferencia caso por caso.
 - **Input del "valor de Lolo"** (a definir): el valor que Lolo le pide cambiar a Nico en el portal; cuando esté la definición, se suma como input y se aplica en la fórmula.
 - **Sincronizar "Mis lotes" entre dispositivos** (opcional): hoy es local al dispositivo; sincronizar requeriría un backend.
@@ -221,6 +224,7 @@ Validado contra la planilla de Nico:
 13. Financiero: `díasFin=max(0,dias−plzc+plzv)`; `rf=tasa/365·díasFin`; `fin=rf·capitalBase` (base = cn, o cn+cp); `rescf=res−fin`.
 14. **Indiferencia** = `((vn−cp)/ent − flei)/(1+desb+comc)` (la mortandad/desbaste ya están en `kgv`). Variantes: `indifcf` (con financiero), `indifobj` (con objetivo $/cab).
 15. Indicadores: `TEA=(1+res/(cn+cp))^(365/dias)−1`; `resanual=res·365/dias`; `costokg=cp/kgp`; `relrepo=pag/psal`; puntos de equilibrio `ventaInd`, `racionInd`.
+16. **Recupero de capital (µ)**: `rmu = tnaFima · µ · días/365`; `CI = cn+cp` (capital inmovilizado); `objMu = CI·rmu` (ganancia objetivo); `indifMu = (vn/(1+rmu) − cp)/ent/(1+desb+comc) − …` (máx a pagar para recuperar el capital + la tasa). `tnaFima` = TNA de fondos FIMA (money market); `µ` la ajusta a la recría.
 
 `vlook(w,tabla)` interpola el promedio por el punto medio de cada banda. `bandOf(w,tabla)` devuelve la banda completa (para máx/mín en Feria).
 
@@ -234,7 +238,7 @@ Clave `recriaLotes` → array de `{f (fecha), cat, ent, sal, dest, pag, indif, d
 `generateReport()` arma un nodo HTML con el estilo de la app → `html2canvas` (imagen) → `jsPDF` (A4) → `navigator.share` (archivo) o descarga.
 
 ### Auto-update (`precios.json`)
-`{ fecha, machos:[[peso,prom,máx,mín]…], hembras:[…], rosgan, novillo, novilloArr, tcUSD, maiz, pMaiz, pSilo, pNucleo }`. La app lo lee al abrir (`fetch` no-store) y actualiza la pizarra (`PIZ`) **y** los parámetros de mercado (`tcUSD`, `alqNov` desde `novilloArr`, y los precios de la dieta `pMaiz`/`pSilo`/`pNucleo`). Es el único lugar donde se editan los precios.
+`{ fecha, machos:[[peso,prom,máx,mín]…], hembras:[…], rosgan, novillo, novilloArr, tcUSD, tnaFima, maiz, pMaiz, pSilo, pNucleo }`. La app lo lee al abrir (`fetch` no-store) y actualiza la pizarra (`PIZ`) **y** los parámetros de mercado (`tcUSD`, `alqNov` desde `novilloArr`, y los precios de la dieta `pMaiz`/`pSilo`/`pNucleo`). Es el único lugar donde se editan los precios.
 
 ### PWA
 `sw.js` (CACHE `recria-v4`): `index.html` y `precios.json` = **red-primero** (siempre lo último, cae a caché sin internet); resto = caché-primero con guardado oportunista (cachea jsPDF/html2canvas tras el primer uso). Al cambiar `index.html` no hace falta reinstalar; al cambiar `sw.js`, subir el número de versión.
@@ -253,6 +257,8 @@ Código sin referencias rotas y JS válido. Tests del modelo: break-even = 0; in
 
 La versión actual se muestra en la cabecera de la app (`v1.x`). La más nueva, arriba.
 
+- **v1.7** (22/06/2026) — **El coeficiente µ ahora impacta el veredicto: semáforo de 3 niveles.** Antes µ solo movía indicadores secundarios; el semáforo principal y el modo Feria seguían usando solo la indiferencia de equilibrio (µ "no se veía"). Ahora el veredicto usa dos umbrales — **verde** (pagado ≤ indiferencia de recupero µ: cierra y le gana al plazo fijo ×µ), **amarillo** (entre recupero y equilibrio: cierra pero no le gana al plazo fijo) y **rojo** (por encima del equilibrio: reclamo). El modo Feria muestra el máximo de equilibrio **y** el de recupero (µ), trae su propio campo µ y el plazo fijo × µ anual, y el medidor del cuadro de resultado se mide contra el recupero. El KPI de TEA y el informe PDF comparan contra **plazo fijo × µ** en lugar de la tasa genérica. (Además: se reparó el archivo maestro `Simulador_Recria_Darwash.html`, que había quedado truncado al final de `renderSens`.)
+- **v1.6** (18/06/2026) — **Recupero de capital (coeficiente µ), reemplaza el objetivo manual.** El antiguo "Objetivo de resultado ($/cab)" se reemplazó por el coeficiente **µ**: el objetivo ahora se calcula solo = capital inmovilizado (compra + costos) × **TNA FIMA × µ** × días/365. La TNA FIMA es la tasa de los fondos money market / plazo fijo; µ la ajusta a lo que se le exige a la recría. En el formulario se carga µ y debajo aparece el objetivo en $/cab calculado; la "Indiferencia objetivo" pasó a ser la **indiferencia de recupero** (máximo a pagar para recuperar el capital + esa tasa). `µ` en el negocio; `tnaFima` editable y por el feed `precios.json`.
 - **v1.5** (18/06/2026) — Todos los precios desde un solo `precios.json`: ahora el feed también trae los insumos de la dieta (maíz puesto, silo, núcleo), no solo la pizarra. Editás un archivo y se actualiza todo (pizarra + costo de suplementación). La fuente de precio de salida pasó a llamarse **"Entre Surcos (por kg)"** (antes "CACG por kilo"), que es de donde sale.
 - **v1.4.3** (17/06/2026) — Fix del gráfico de la pizarra y el medidor en modo oscuro (el área bajo la curva y el fondo de la grilla tenían color claro fijo); ahora se adaptan al tema y se refrescan al cambiar de modo.
 - **v1.4.2** (17/06/2026) — Más fixes de contraste en modo oscuro: encabezados de tablas, tarjetas de indicadores destacadas y el texto de los carteles informativos tenían fondo/color claro fijo; ahora se adaptan al tema oscuro.
@@ -269,4 +275,4 @@ La versión actual se muestra en la cabecera de la app (`v1.x`). La más nueva, 
 
 **Este README se actualiza con cada cambio del simulador** (qué se agrega, saca o modifica). Es la base de contexto para retomar el trabajo y para asistentes de IA (Copilot). Mantenerlo al día es obligatorio.
 
-_Versión actual: **v1.5**. Cambios registrados por versión en el changelog. Última actualización: 18/06/2026 — todos los precios unificados en `precios.json` + fuente renombrada "Entre Surcos (por kg)". (Histórico: sección Capturas + guía de instalación (iOS/Android/PC) + changelog; documentación técnica completa (modelo, datos, funciones, PWA, notas para standalone) + auditoría integral; KPIs jerarquizados (3 principales visibles + "Ver más indicadores"); "Guardar lote" + pestaña "Mis lotes" (registro en el dispositivo) reemplazando la "Análisis de compras" de prueba; selector de destino en modo Feria con rango máx/mín de Entre Surcos; parámetros básicos/avanzados; informe PDF; cascada por hectárea; dieta de 3 insumos; modos alquiler/capitalización. La pizarra (`precios.json`) guarda por banda [peso, prom, máx, mín].)_
+_Versión actual: **v1.6**. Cambios registrados por versión en el changelog. Última actualización: 18/06/2026 — indiferencia por recupero de capital (coef. µ sobre TNA FIMA); precios unificados en `precios.json`; fuente "Entre Surcos (por kg)". (Histórico: sección Capturas + guía de instalación (iOS/Android/PC) + changelog; documentación técnica completa (modelo, datos, funciones, PWA, notas para standalone) + auditoría integral; KPIs jerarquizados (3 principales visibles + "Ver más indicadores"); "Guardar lote" + pestaña "Mis lotes" (registro en el dispositivo) reemplazando la "Análisis de compras" de prueba; selector de destino en modo Feria con rango máx/mín de Entre Surcos; parámetros básicos/avanzados; informe PDF; cascada por hectárea; dieta de 3 insumos; modos alquiler/capitalización. La pizarra (`precios.json`) guarda por banda [peso, prom, máx, mín].)_

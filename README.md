@@ -2,13 +2,12 @@
 
 App (PWA) para evaluar en la feria si conviene comprar un lote de terneros para **recría**, comparando el $/kg pagado contra el **precio de indiferencia** (punto de equilibrio).
 
-El semáforo tiene **tres niveles**, usando dos umbrales: la **indiferencia de equilibrio** (resultado cero) y la **indiferencia de recupero (µ)** (máximo a pagar para que además recupere el capital al ritmo del plazo fijo × µ):
+La indiferencia que se muestra es **una sola: la indiferencia (µ)** — el máximo a pagar para que la recría rinda al menos el plazo fijo × µ. El coeficiente **µ** es la palanca: con **µ = 0** la indiferencia es el punto de equilibrio puro (resultado cero / línea de reclamo); con **µ = 1** exige igualar el plazo fijo; con **µ > 1**, ganarle.
 
-- **Verde** = se pagó por debajo de la indiferencia de recupero → cierra **y** le gana al plazo fijo (×µ). Buena compra.
-- **Amarillo** = se pagó entre el recupero y el equilibrio → cierra, pero **no** le gana al plazo fijo (la plata rendiría parecido en un plazo fijo).
-- **Rojo** = se pagó por encima del equilibrio → mala compra → reclamo a la feria.
+- **Verde** = se pagó por debajo de la indiferencia (µ) → buena compra (rinde lo pedido).
+- **Rojo** = se pagó por encima → mala compra.
 
-El criterio es **indiferencia** (equilibrio + recupero de capital), NO un margen objetivo fijo.
+El criterio es **indiferencia**, NO un margen objetivo fijo. (El punto de equilibrio puro sigue disponible en la pestaña "Detalle del cálculo".)
 
 Vive en: https://harambeiskappa.github.io/Simulador-Recria/
 
@@ -257,6 +256,8 @@ Código sin referencias rotas y JS válido. Tests del modelo: break-even = 0; in
 
 La versión actual se muestra en la cabecera de la app (`v1.x`). La más nueva, arriba.
 
+- **v1.9** (24/06/2026) — **Una sola indiferencia (la de µ) + fix de µ negativo.** Antes se mostraban dos indiferencias (equilibrio y recupero) y el número grande era el de equilibrio, que no se mueve con µ → daba la sensación de que µ "no impactaba". Ahora se muestra **una sola indiferencia, la de µ**, como número principal en Feria y en el resultado: al mover µ, el "máximo a pagar" cambia al instante. Veredicto a **2 niveles** (verde/rojo) contra esa indiferencia. El punto de equilibrio puro queda en el Detalle. **Fix:** µ se limita a **≥ 0** (un µ negativo daba una tasa negativa que inflaba la indiferencia por encima del equilibrio y marcaba VERDE sin sentido; ahora µ negativo se trata como 0 = equilibrio).
+- **v1.8** (24/06/2026) — **Calibración con valores estándar de referencia.** Como todavía no hay datos reales de los campos de recría, se cargaron valores estándar promediados de fuentes técnicas (INTA/CREA, Cámara/ROSGAN) para no analizar con números de prueba: aumento diario **0,6 kg/día** (pasturas 0,55 / objetivo 0,7–0,8), carga **2,5 cab/ha** (producción 400–500 kg/ha ÷ ganancia individual), mortandad por ciclo **2 %** (~3 %/año nacional prorrateado), comisión de **compra 4 %** y **venta 5 %** (reglamento ROSGAN), merma a la venta **5 %** (transporte >300 km). Todos quedan marcados como orientativos y son editables; la carga y las comisiones dependen del campo y de la feria concretos, a confirmar. (Nota: El Aras es el campo **donde está el feedlot**, no un campo de recría.)
 - **v1.7** (22/06/2026) — **El coeficiente µ ahora impacta el veredicto: semáforo de 3 niveles.** Antes µ solo movía indicadores secundarios; el semáforo principal y el modo Feria seguían usando solo la indiferencia de equilibrio (µ "no se veía"). Ahora el veredicto usa dos umbrales — **verde** (pagado ≤ indiferencia de recupero µ: cierra y le gana al plazo fijo ×µ), **amarillo** (entre recupero y equilibrio: cierra pero no le gana al plazo fijo) y **rojo** (por encima del equilibrio: reclamo). El modo Feria muestra el máximo de equilibrio **y** el de recupero (µ), trae su propio campo µ y el plazo fijo × µ anual, y el medidor del cuadro de resultado se mide contra el recupero. El KPI de TEA y el informe PDF comparan contra **plazo fijo × µ** en lugar de la tasa genérica. (Además: se reparó el archivo maestro `Simulador_Recria_Darwash.html`, que había quedado truncado al final de `renderSens`.)
 - **v1.6** (18/06/2026) — **Recupero de capital (coeficiente µ), reemplaza el objetivo manual.** El antiguo "Objetivo de resultado ($/cab)" se reemplazó por el coeficiente **µ**: el objetivo ahora se calcula solo = capital inmovilizado (compra + costos) × **TNA FIMA × µ** × días/365. La TNA FIMA es la tasa de los fondos money market / plazo fijo; µ la ajusta a lo que se le exige a la recría. En el formulario se carga µ y debajo aparece el objetivo en $/cab calculado; la "Indiferencia objetivo" pasó a ser la **indiferencia de recupero** (máximo a pagar para recuperar el capital + esa tasa). `µ` en el negocio; `tnaFima` editable y por el feed `precios.json`.
 - **v1.5** (18/06/2026) — Todos los precios desde un solo `precios.json`: ahora el feed también trae los insumos de la dieta (maíz puesto, silo, núcleo), no solo la pizarra. Editás un archivo y se actualiza todo (pizarra + costo de suplementación). La fuente de precio de salida pasó a llamarse **"Entre Surcos (por kg)"** (antes "CACG por kilo"), que es de donde sale.

@@ -16,6 +16,7 @@
 
 
 
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
@@ -257,14 +258,14 @@ html.dark .flag,html.dark .wip-banner{color:var(--ambar)}
 </div>
 </div>
 <script>
-const APP_VER="v2.0";
+const APP_VER="v2.4";
 (function(){try{var t=localStorage.getItem("recriaTheme");if(t==="dark"||(!t&&window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches))document.documentElement.classList.add("dark");}catch(e){}})();
 /* ===== PRECIOS-INICIO (lo actualiza la tarea diaria) ===== */
-const PIZ_FECHA="23/06/2026 · maíz Rosario 23/06 · invernada 16/06 Entre Surcos y Corrales";
+const PIZ_FECHA="12/11/2026 · maíz Rosario 10/11 (pizarra BCR) · invernada boletín CACG N°11 (oct-26, Entre Surcos y Corrales) · novillo CACG oct-26";
 const PIZ={
-  machos:[[0,7455,8242,4350],[100,6846,7719,5500],[130,6801,13448,5800],[160,6454,7341,5722],[180,6362,7198,5297],[200,6207,7050,4850],[230,5754,6400,4240],[260,5136,5750,4200],[300,4736,5161,4062],[330,4581,5050,4000],[370,4368,4675,4071],[400,4102,5620,3277]],
-  hembras:[[0,6523,6588,6000],[100,6464,7500,4417],[130,6124,7185,5000],[150,5953,7742,5333],[170,5851,7000,4900],[190,5762,7129,4800],[210,5523,6800,4000],[250,4903,6770,4137],[290,4724,5267,3613],[320,4502,4925,3818],[390,3683,3800,3023]],
-  rosgan:4900, novillo:4133, maiz:261450
+  machos:[[0,8501,9400,7600],[100,7157,8932,4600],[130,6701,8194,5020],[160,6288,8547,4598],[180,6109,7796,5000],[200,5989,7200,4430],[230,5701,6950,3922],[260,5280,6000,3860],[300,5167,6200,4121],[330,5036,5650,3313],[370,4678,5220,4120],[400,4333,5000,3820]],
+  hembras:[[0,7156,9778,5440],[100,7089,8186,5159],[130,6142,7037,4930],[150,5847,7325,4808],[170,5635,6800,4301],[190,5608,6927,4500],[210,5386,6842,4000],[250,4985,6654,4138],[290,4724,6161,3750],[320,4661,5460,3465]],
+  rosgan:4900, novillo:4307, maiz:274300
 };
 /* ===== PRECIOS-FIN ===== */
 /* ===== MIS LOTES (guardados en el dispositivo) ===== */
@@ -289,7 +290,7 @@ function exportLotes(){
 function bandOf(w,t){let r=t[0];for(const x of t){if(x[0]<=w)r=x;}return r;}
 function vlook(w,t){/* precio = promedio de banda; interpolamos por el punto medio de cada banda */ const m=t.map((p,i)=>[i<t.length-1?(p[0]+t[i+1][0])/2:p[0]+15,p[1]]); if(w<=m[0][0])return m[0][1]; for(let i=0;i<m.length-1;i++){if(w>=m[i][0]&&w<m[i+1][0])return m[i][1]+(m[i+1][1]-m[i][1])*(w-m[i][0])/(m[i+1][0]-m[i][0]);} return m[m.length-1][1];}
 const PARAMS={aum:0.4,tasa:0.19,tnaFima:0.19,mu:1.0,plzc:30,plzv:30,base:"Compra + Costos",mortc:0.03,
-  modoCampo:"Alquiler",pctCapt:0.30,sieMet:"Aéreo (voleo)",tcUSD:1570,semPr:0.65,labAv:30,labTe:40,semAv:55,semTe:40,pastImpl:385264,pastDur:1,mant:207,alqKg:55,alqNov:5200,car:4.5,consMS:0.028,pctsupl:0,diasSupl:0,markupSupl:0.05,pMaiz:233942,pSilo:175849,pNucleo:471700,rMaiz:10,rSilo:85,rNucleo:5,msMaiz:87,msSilo:50,msNucleo:97.5,hotel:0,san:8000,comc:0.03,comv:0.03,gui:1725,desb:0,desbv:0,deco:0,
+  modoCampo:"Alquiler",pctCapt:0.30,sieMet:"Aéreo (voleo)",tcUSD:1570,semPr:0.65,labAv:30,labTe:40,semAv:55,semTe:40,pastUSD:254.3,pastDur:1,mantUSD:122,alqKg:55,alqNov:5200,car:4.5,consMS:0.028,pctsupl:0,diasSupl:0,markupSupl:0.05,pMaiz:233942,pSilo:175849,pNucleo:471700,rMaiz:10,rSilo:85,rNucleo:5,msMaiz:87,msSilo:50,msNucleo:97.5,hotel:0,san:8000,comc:0.03,comv:0.03,gui:1725,desb:0,desbv:0,deco:0,
   tarifa:3000,cfijo:0,jcomp:12000,jvent:19000,ivavh:0.105,ivach:0.105,ivaf:0.21,ivas:0.21,mni:224000,alic:0.02};
 const NEG={categ:"Machos",modo:"Por días",ent:209,sal:300,dias_in:227,pag:5700,mu:1.0,
   dest:"TRANSFERENCIA",fuente:"Entre Surcos (por kg)",psalin:4800,rinde:0.52,kmi:150,kms:640};
@@ -307,7 +308,7 @@ function calc(N,P){
   const aereo=P.sieMet==="Aéreo (voleo)";
   const verdLab=aereo?P.labAv:P.labTe, verdSem=aereo?P.semAv:P.semTe;
   const verdImpl=(verdLab+verdSem*P.semPr)*P.tcUSD;
-  const campoHa=verdImpl+P.pastImpl/P.pastDur+P.mant+P.alqKg*P.alqNov;
+  const campoHa=verdImpl+(P.pastUSD*P.tcUSD)/P.pastDur+(P.mantUSD*P.tcUSD)+P.alqKg*P.alqNov;
   const dsupl=P.diasSupl>0?P.diasSupl:dias;
   let psal_inv=N.fuente==="Manual"?N.psalin:(N.fuente==="ROSGAN índice"?PIZ.rosgan:vlook(salef,tbl));
   let psal=N.dest==="FAENA"?N.psalin*N.rinde:(N.dest==="TRANSFERENCIA"?vlook(salef,tbl):psal_inv);
@@ -337,8 +338,12 @@ function calc(N,P){
   const consTCdia=pesoProm*consTCpv*P.pctsupl, totalTC=consTCdia*dsupl;
   const ventaInd = N.dest==="TRANSFERENCIA" ? (cn+cp)/kgv : (((cn+cp)/kgv)+fles+P.gui/kgv)/(1-P.comv-P.deco);
   const racionInd = totalTC>0 ? (vn-cn-atot-P.san)/totalTC : 0;
+  // Hacienda propia: márgenes que quedan en la casa (PEGSA) si hace toda la cadena
+  const hpComCompra=N.pag*P.comc*N.ent, hpComVenta=(N.dest==="TRANSFERENCIA"?0:psal*P.comv*kgv);
+  const hpDieta=stot-(stot/(1+P.markupSupl)), hpFletes=(flei*N.ent+fles*salef)*0.20;
+  const hpTotal=hpComCompra+hpComVenta+hpDieta+hpFletes, resConsol=res+hpTotal;
   return {dias,salef,kgp,flei,fles,cp,atot,stot,hot,verdImpl,psal,cnkg,cn,kgv,gv,vnkg,vn,mort,res,diasf,rf,fin,rescf,consTCdia,totalTC,ventaInd,racionInd,costoDietaTon,msDieta,
-    retg,ivap,indif,indifcf,estado,relrepo,indifobj,rt,tea,ciclos,resanual:res*ciclos,costokg:kgp?cp/kgp:0,rescom,resprod,rmu,CI,objMu,indifMu};
+    retg,ivap,indif,indifcf,estado,relrepo,indifobj,rt,tea,ciclos,resanual:res*ciclos,costokg:kgp?cp/kgp:0,rescom,resprod,rmu,CI,objMu,indifMu,hpComCompra,hpComVenta,hpDieta,hpFletes,hpTotal,resConsol};
 }
 const f0=v=>"$ "+Math.round(v).toLocaleString("es-AR");
 const f0p=v=>(v<0?"−$ ":"$ ")+Math.abs(Math.round(v)).toLocaleString("es-AR");
@@ -401,7 +406,7 @@ const PADV=[
   ["tcUSD","Tipo de cambio<sup class='rev'>*</sup>","$/US",10],["semPr","Precio semilla","us/kg",0.05],
   ["labAv","Labor aéreo","us/ha",1],["semAv","Semilla aéreo","kg/ha",1],["labTe","Labor terrestre","us/ha",1],["semTe","Semilla terrestre","kg/ha",1],
   ["CAMPO (técnico)"],
-  ["pastImpl","Implem. pasturas<sup class='rev'>*</sup>","$/ha",1000],["pastDur","Duración pasturas","años",1],["mant","Mantenimiento<sup class='rev'>*</sup>","$/ha año",1000],["hotel","Hotelería","$/cab día",10],
+  ["pastUSD","Implem. pasturas<sup class='rev'>*</sup>","US/ha",5],["pastDur","Duración pasturas","años",1],["mantUSD","Mantenimiento<sup class='rev'>*</sup>","US/ha año",5],["hotel","Hotelería","$/cab día",10],
   ["DIETA (receta y materia seca)"],
   ["consMS","Consumo MS (% PV)","%",0.1,true],["markupSupl","Markup transferencia","%",1,true],
   ["rMaiz","Receta maíz","partes",1],["rSilo","Receta silo","partes",1],["rNucleo","Receta núcleo","partes",1],
@@ -635,6 +640,7 @@ function renderAll(){
         kpi("Costo por kg producido",f0(R.costokg),"qué cuesta cada kilo",false,'')+
         kpi("Relación de reposición",R.relrepo.toFixed(2).replace(".",",")+" x","pagado ÷ salida · informativo",false,'')+
         kpi("Indiferencia (µ)",f0(R.indifMu),"máx a pagar p/ rendir el plazo fijo × µ · tasa "+fp(R.rmu),false,'')+
+        kpi("Consolidado del grupo",f0p(R.resConsol),"ganadería + comisiones de la consignataria propia",false,R.resConsol>=0?'pos':'neg')+
       '</div></details>';
   renderDetalle(R); renderPiz(R); renderBacktest(); renderSens();
 }
@@ -706,7 +712,9 @@ function renderDetalle(R){
     <tr class="sub"><td colspan="2"><b>IMPUESTOS</b></td></tr>${L("Retención ganancias",f0(R.retg),1)}${L("IVA posición",f0p(R.ivap),1)}
     <tr class="sub"><td colspan="2"><b>PUNTOS DE EQUILIBRIO (INDIFERENCIA)</b></td></tr>${L("Precio venta indif. (vivo)",f0(R.ventaInd)+" $/kg",1)}${L("Precio compra indif. (vivo)",f0(R.indif)+" $/kg",1)}${L("Precio ración indif.",f0(R.racionInd)+" $/kgTC",1)}${L("Indif. recupero capital (µ)",f0(R.indifMu)+" $/kg",1)}
     <tr class="sub"><td colspan="2"><b>RESULTADO</b></td></tr>${L("Resultado comercial",f0p(R.rescom),1)}${L("Resultado producción",f0p(R.resprod),1)}
-    <tr class="tot"><td>RESULTADO ECONÓMICO</td><td class="num" style="color:${R.res>=0?'var(--verde)':'var(--rojo)'}">${f0p(R.res)}</td></tr></table>`;
+    <tr class="tot"><td>RESULTADO ECONÓMICO</td><td class="num" style="color:${R.res>=0?'var(--verde)':'var(--rojo)'}">${f0p(R.res)}</td></tr>
+    <tr class="sub"><td colspan="2"><b>CONSOLIDADO DEL GRUPO (GANADERÍA + CONSIGNATARIA PROPIA)</b></td></tr>${L("Resultado ganadería",f0p(R.res),1)}${L("+ Comisión de compra (consignataria propia)",f0p(R.hpComCompra),1)}${L("+ Comisión de venta (consignataria propia)",f0p(R.hpComVenta),1)}${L("+ Margen alimentación (markup dieta)",f0p(R.hpDieta),1)}${L("+ Margen fletes propios (20%)",f0p(R.hpFletes),1)}
+    <tr class="tot"><td>RESULTADO CONSOLIDADO</td><td class="num" style="color:var(--accent)">${f0p(R.resConsol)}</td></tr></table>`;
   document.getElementById("detalle").innerHTML=`<div>${c1}</div><div>${c2}</div>`;
 }
 let BTFILTER="all", BTFERIA="all", kpiOpen=false;
@@ -793,4 +801,3 @@ if("serviceWorker" in navigator){window.addEventListener("load",function(){navig
 </script>
 </body>
 </html>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            

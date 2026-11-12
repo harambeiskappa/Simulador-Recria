@@ -19,6 +19,7 @@
 
 
 
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
@@ -260,7 +261,7 @@ html.dark .flag,html.dark .wip-banner{color:var(--ambar)}
 </div>
 </div>
 <script>
-const APP_VER="v2.6";
+const APP_VER="v2.7";
 (function(){try{var t=localStorage.getItem("recriaTheme");if(t==="dark"||(!t&&window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches))document.documentElement.classList.add("dark");}catch(e){}})();
 /* ===== PRECIOS-INICIO (lo actualiza la tarea diaria) ===== */
 const PIZ_FECHA="12/11/2026 · maíz Rosario 10/11 (pizarra BCR) · invernada boletín CACG N°11 (oct-26, Entre Surcos y Corrales) · novillo CACG oct-26";
@@ -376,6 +377,7 @@ function renderNegocio(){
     h+=`<div class="field-help">Capital inmovilizado × TNA FIMA × µ — lo que se busca ganar para recuperar el capital invertido.</div>`;
   }
   h+=sel("dest","Destino de salida",["INVERNADA","FAENA","TRANSFERENCIA"],NEG.dest);
+  h+=`<div class="field-help">${({INVERNADA:"Vendés la invernada a un tercero: precio de mercado menos comisión, flete y guías.",FAENA:"Hasta el gancho: precio de carne × rendimiento (res, no en pie).",TRANSFERENCIA:"Pasa al feedlot propio para terminar el engorde y subir de categoría (TM→NOV, TH→VQ, VQ→VA). Se valúa a pizarra, sin gastos de venta. Es el camino más común."})[NEG.dest]}</div>`;
   if(showFuente) h+=sel("fuente","Fuente precio salida",["Entre Surcos (por kg)","ROSGAN índice","Manual"],NEG.fuente);
   if(showPsal) h+=inp("psalin","Precio de salida",NEG.dest==="FAENA"?"$/kg carne":"$/kg vivo",NEG.psalin,10);
   if(showRinde) h+=inp("rinde","Rinde","%",NEG.rinde*100,0.5);

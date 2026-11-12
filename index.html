@@ -257,7 +257,7 @@ html.dark .flag,html.dark .wip-banner{color:var(--ambar)}
 </div>
 </div>
 <script>
-const APP_VER="v1.9";
+const APP_VER="v2.0";
 (function(){try{var t=localStorage.getItem("recriaTheme");if(t==="dark"||(!t&&window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches))document.documentElement.classList.add("dark");}catch(e){}})();
 /* ===== PRECIOS-INICIO (lo actualiza la tarea diaria) ===== */
 const PIZ_FECHA="23/06/2026 · maíz Rosario 23/06 · invernada 16/06 Entre Surcos y Corrales";
@@ -288,10 +288,10 @@ function exportLotes(){
 }
 function bandOf(w,t){let r=t[0];for(const x of t){if(x[0]<=w)r=x;}return r;}
 function vlook(w,t){/* precio = promedio de banda; interpolamos por el punto medio de cada banda */ const m=t.map((p,i)=>[i<t.length-1?(p[0]+t[i+1][0])/2:p[0]+15,p[1]]); if(w<=m[0][0])return m[0][1]; for(let i=0;i<m.length-1;i++){if(w>=m[i][0]&&w<m[i+1][0])return m[i][1]+(m[i+1][1]-m[i][1])*(w-m[i][0])/(m[i+1][0]-m[i][0]);} return m[m.length-1][1];}
-const PARAMS={aum:0.6,tasa:0.19,tnaFima:0.19,mu:1.0,plzc:30,plzv:30,base:"Compra + Costos",mortc:0.02,
-  modoCampo:"Alquiler",pctCapt:0.30,sieMet:"Aéreo (voleo)",tcUSD:1446,semPr:0.65,labAv:30,labTe:40,semAv:55,semTe:40,pastImpl:368735,pastDur:4,mant:176900,alqKg:75,alqNov:4179,car:2.5,consMS:0.028,pctsupl:0.40,diasSupl:30,markupSupl:0.05,pMaiz:217761,pSilo:166257,pNucleo:409050,rMaiz:10,rSilo:85,rNucleo:5,msMaiz:87,msSilo:50,msNucleo:97.5,hotel:0,san:7500,comc:0.04,comv:0.05,gui:1725,desb:0,desbv:0.05,deco:0,
+const PARAMS={aum:0.4,tasa:0.19,tnaFima:0.19,mu:1.0,plzc:30,plzv:30,base:"Compra + Costos",mortc:0.03,
+  modoCampo:"Alquiler",pctCapt:0.30,sieMet:"Aéreo (voleo)",tcUSD:1570,semPr:0.65,labAv:30,labTe:40,semAv:55,semTe:40,pastImpl:385264,pastDur:1,mant:207,alqKg:55,alqNov:5200,car:4.5,consMS:0.028,pctsupl:0,diasSupl:0,markupSupl:0.05,pMaiz:233942,pSilo:175849,pNucleo:471700,rMaiz:10,rSilo:85,rNucleo:5,msMaiz:87,msSilo:50,msNucleo:97.5,hotel:0,san:8000,comc:0.03,comv:0.03,gui:1725,desb:0,desbv:0,deco:0,
   tarifa:3000,cfijo:0,jcomp:12000,jvent:19000,ivavh:0.105,ivach:0.105,ivaf:0.21,ivas:0.21,mni:224000,alic:0.02};
-const NEG={categ:"Machos",modo:"Por días",ent:180,sal:330,dias_in:150,pag:6556,mu:1.0,
+const NEG={categ:"Machos",modo:"Por días",ent:209,sal:300,dias_in:227,pag:5700,mu:1.0,
   dest:"TRANSFERENCIA",fuente:"Entre Surcos (por kg)",psalin:4800,rinde:0.52,kmi:150,kms:640};
 function calc(N,P){
   const tbl=N.categ==="Machos"?PIZ.machos:PIZ.hembras;

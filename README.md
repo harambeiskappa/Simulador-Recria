@@ -1,4 +1,4 @@
-# Simulador de Recría — Darwash SA
+# Simulador de Recría — Grupo PEGSA & BULL
 
 App (PWA) para evaluar en la feria si conviene comprar un lote de terneros para **recría**, comparando el $/kg pagado contra el **precio de indiferencia** (punto de equilibrio).
 
@@ -256,6 +256,7 @@ Código sin referencias rotas y JS válido. Tests del modelo: break-even = 0; in
 
 La versión actual se muestra en la cabecera de la app (`v1.x`). La más nueva, arriba.
 
+- **v2.8** (12/11/2026) — **Marca a "Grupo PEGSA & BULL".** El simulador pasó a estar marcado como del **Grupo PEGSA & BULL** (antes "Darwash SA"), ya que es del grupo entero y no solo de la consignataria: se cambió en el título, la cabecera de la app, el informe PDF, el nombre de la app (manifest) y la portada del Libro de cambios. Las menciones a Darwash en el changelog y en la explicación de la estructura se mantienen (ahí es correctamente una de las dos consignatarias, junto con Bulltrade).
 - **v2.7** (12/11/2026) — **Texto de ayuda en los destinos de salida.** Debajo del selector de destino hay una línea que explica la opción elegida, reflejando el flujo real del negocio: la invernada casi siempre **se transfiere al feedlot propio** para terminar el engorde y subir de categoría de comercialización (TM→NTO/NOV, TH→VQ, VQ→VA). Invernada = venta a tercero (con comisión/flete/guías); Faena = carne × rendimiento; Transferencia = pizarra sin gastos de venta (movimiento interno). Transferencia sigue siendo el destino por defecto.
 - **v2.6** (12/11/2026) — **Objetivo por tasa (µ) o por monto ($) — al estilo Nico.** En el form del negocio hay un selector **"Objetivo por"**: **"Tasa (µ)"** (lo de siempre: objetivo = capital × plazo fijo × µ) o **"Monto ($/cab)"** (ponés cuánto querés ganar por cabeza y el simulador calcula la indiferencia para alcanzarlo, mostrando además **a qué µ equivale**). Los dos manejan la misma indiferencia de recupero; cambia solo la forma de fijar el objetivo. Verificado: con objetivo $0 la indiferencia es el equilibrio; $50.000/cab equivale a µ ≈ 0,31. En el modo Feria, tocar el µ vuelve al modo tasa.
 - **v2.5** (12/11/2026) — **% de hacienda propia ajustable + nombre del feedlot.** El "Consolidado del grupo" ahora tiene un **% de hacienda propia** (en el form Comercial, default 100%) que escala cuánto de los márgenes de comercialización queda en el grupo: a 100% suma todas las comisiones/márgenes; a 0% el consolidado es solo la ganadería; en el medio, parcial. Además se corrigió el nombre del feedlot a **"El Haras"** (estaba "El Aras") en la cabecera de la app y en el informe PDF.

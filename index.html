@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Simulador de Recría · Darwash SA</title>
+<title>Simulador de Recría · Grupo PEGSA &amp; BULL</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta name="theme-color" content="#13402c">
@@ -13,6 +13,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Recría">
+
 
 
 
@@ -195,7 +196,7 @@ html.dark .flag,html.dark .wip-banner{color:var(--ambar)}
   <div class="brand">
     <div class="logo"><svg width="26" height="26" viewBox="0 0 100 100" aria-hidden="true"><text x="50" y="62" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="56" font-weight="700" fill="#fff">R</text><rect x="33" y="71" width="34" height="6" rx="3" fill="#e3b24d"/><circle cx="41" cy="85" r="4" fill="#5fd19a"/><circle cx="59" cy="85" r="4" fill="#e8857c"/></svg></div>
     <div><h1>Simulador de Recría</h1>
-      <div class="sub">Darwash SA · Feedlot El Haras · evaluación de compras por indiferencia</div></div>
+      <div class="sub">Grupo PEGSA &amp; BULL · Feedlot El Haras · evaluación de compras por indiferencia</div></div>
   </div>
   <div style="display:flex;align-items:center;gap:9px"><div class="meta">Engorde a campo · <span id="appVer">v1.6</span><br>Pizarra: <span id="pizFecha">—</span></div><button class="gear" id="themeBtn" onclick="toggleTheme()" aria-label="Cambiar tema" title="Claro / oscuro" style="padding:8px 11px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button><button class="gear" onclick="checkUpdate()" aria-label="Buscar actualización" title="Buscar actualización" style="padding:8px 12px">↻</button><button id="gearBtn" class="gear" aria-label="Abrir parámetros">⚙ Parámetros</button></div>
 </header>
@@ -261,7 +262,7 @@ html.dark .flag,html.dark .wip-banner{color:var(--ambar)}
 </div>
 </div>
 <script>
-const APP_VER="v2.7";
+const APP_VER="v2.8";
 (function(){try{var t=localStorage.getItem("recriaTheme");if(t==="dark"||(!t&&window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches))document.documentElement.classList.add("dark");}catch(e){}})();
 /* ===== PRECIOS-INICIO (lo actualiza la tarea diaria) ===== */
 const PIZ_FECHA="12/11/2026 · maíz Rosario 10/11 (pizarra BCR) · invernada boletín CACG N°11 (oct-26, Entre Surcos y Corrales) · novillo CACG oct-26";
@@ -458,7 +459,7 @@ function shareResult(){
   L.push("Indiferencia (µ="+(NEG.mu==null?1:NEG.mu)+"): "+f0(R.indifMu)+" $/kg");
   L.push({verde:"✓ BUENA COMPRA — rinde lo pedido (plazo fijo ×µ)",rojo:"✗ MALA COMPRA — por encima de la indiferencia (µ)"}[niv]);
   L.push("TEA "+fp(R.tea)+" vs plazo fijo×µ "+fp(benchAnual));
-  L.push("— Simulador de Recría · Darwash");
+  L.push("— Simulador de Recría · Grupo PEGSA & BULL");
   const txt=L.join("\n");
   if(navigator.share){ navigator.share({title:"Evaluación de compra",text:txt}).catch(function(){}); }
   else if(navigator.clipboard){ navigator.clipboard.writeText(txt).then(function(){alert("Resumen copiado al portapapeles");}).catch(function(){alert(txt);}); }
@@ -492,7 +493,7 @@ function generateReport(){
     <div style='background:#13402c;padding:20px 26px;display:flex;justify-content:space-between;align-items:center'>
       <div style='display:flex;align-items:center;gap:14px'>${logo}
         <div><div style='color:#fff;font-size:21px;font-weight:800'>Informe de evaluacion de compra</div>
-        <div style='color:#c8d6cc;font-size:12px;margin-top:3px'>Simulador de Recria \u00b7 Darwash SA \u00b7 Feedlot El Haras</div></div></div>
+        <div style='color:#c8d6cc;font-size:12px;margin-top:3px'>Simulador de Recria \u00b7 Grupo PEGSA &amp; BULL \u00b7 Feedlot El Haras</div></div></div>
       <div style='color:#fff;font-size:12px'>${fecha}</div></div>
     <div style='height:5px;background:#b8862f'></div>
     <div style='padding:22px 26px'>
@@ -518,7 +519,7 @@ function generateReport(){
         ${kpi(P.swap,'Relacion de reposicion',R.relrepo.toFixed(2).replace('.',',')+' x','pagado / salida \u00b7 informativo','#15241c')}
       </div>
       <div style='border-top:1px solid #dce2db;margin-top:18px;padding-top:12px;font-size:11px;color:#6a746c;line-height:1.55'>
-        Criterio: precio de compra de indiferencia (punto de equilibrio). Verde = compra conveniente; rojo = por encima de la indiferencia. Algunos parametros son provisorios.<br>Simulador de Recria \u00b7 Darwash SA \u2014 ${fecha}
+        Criterio: precio de compra de indiferencia (punto de equilibrio). Verde = compra conveniente; rojo = por encima de la indiferencia. Algunos parametros son provisorios.<br>Simulador de Recria \u00b7 Grupo PEGSA &amp; BULL \u2014 ${fecha}
       </div></div>`;
   document.body.appendChild(sheet);
   html2canvas(sheet,{scale:2,backgroundColor:'#ffffff',windowWidth:720}).then(canvas=>{

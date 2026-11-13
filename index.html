@@ -22,6 +22,7 @@
 
 
 
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
@@ -265,7 +266,7 @@ html.dark .flag,html.dark .wip-banner{color:var(--ambar)}
 </div>
 </div>
 <script>
-const APP_VER="v3.0";
+const APP_VER="v3.1";
 (function(){try{var t=localStorage.getItem("recriaTheme");if(t==="dark"||(!t&&window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches))document.documentElement.classList.add("dark");}catch(e){}})();
 /* ===== PRECIOS-INICIO (lo actualiza la tarea diaria) ===== */
 const PIZ_FECHA="13/11/2026 · maíz Rosario 11/11 (pizarra BCR) · invernada boletín CACG N°11 (oct-26, Entre Surcos y Corrales) · novillo CACG oct-26";
@@ -468,8 +469,10 @@ function shareResult(){
   else if(navigator.clipboard){ navigator.clipboard.writeText(txt).then(function(){alert("Resumen copiado al portapapeles");}).catch(function(){alert(txt);}); }
   else { alert(txt); }
 }
-function generateReport(){
-  if(!window.html2canvas||!(window.jspdf&&window.jspdf.jsPDF)){ alert('El generador esta cargando. Proba de nuevo en un instante.'); return; }
+function generateReport(mode){
+  mode=mode||'img';
+  if(!window.html2canvas){ alert('El generador esta cargando. Proba de nuevo en un instante.'); return; }
+  if(mode==='pdf'&&!(window.jspdf&&window.jspdf.jsPDF)){ alert('El generador de PDF esta cargando. Proba de nuevo en un instante.'); return; }
   const R=calc(NEG,PARAMS); const dif=R.indif-NEG.pag;
   const niv = NEG.pag<=R.indifMu ? 'verde' : 'rojo';
   const rep={verde:{bg:'#e7f4ec',bd:'#bfe3cd',col:'#1f8a4c',ti:'VERDE — Buena compra',tx:'Se pago por debajo de la indiferencia (µ): cierra y rinde lo pedido (plazo fijo × µ).'},
@@ -527,12 +530,24 @@ function generateReport(){
   document.body.appendChild(sheet);
   html2canvas(sheet,{scale:2,backgroundColor:'#ffffff',windowWidth:720}).then(canvas=>{
     if(document.body.contains(sheet))document.body.removeChild(sheet);
-    const { jsPDF }=window.jspdf; const img=canvas.toDataURL('image/png');
-    const pdf=new jsPDF({unit:'pt',format:'a4'}); const pw=595,m=22,iw=pw-2*m,ih=canvas.height*(iw/canvas.width);
-    pdf.addImage(img,'PNG',m,m,iw,ih);
-    const blob=pdf.output('blob'); const file=new File([blob],'informe-recria.pdf',{type:'application/pdf'});
-    try{ if(navigator.canShare&&navigator.canShare({files:[file]})){ navigator.share({files:[file],title:'Informe de evaluacion de compra'}).catch(function(){}); return; } }catch(e){}
-    pdf.save('informe-recria.pdf');
+    if(mode==='pdf'){
+      const { jsPDF }=window.jspdf; const img=canvas.toDataURL('image/png');
+      const pdf=new jsPDF({unit:'pt',format:'a4'}); const pw=595,m=22,iw=pw-2*m,ih=canvas.height*(iw/canvas.width);
+      pdf.addImage(img,'PNG',m,m,iw,ih); pdf.save('informe-recria.pdf');
+      return;
+    }
+    // Imagen PNG: se comparte y se pega mucho mejor que el PDF
+    canvas.toBlob(function(blob){
+      if(!blob){ alert('No se pudo generar la imagen.'); return; }
+      const file=new File([blob],'informe-recria.png',{type:'image/png'});
+      const dl=function(){ const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='informe-recria.png'; document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(function(){URL.revokeObjectURL(url);},1500); };
+      // 1) Compartir como imagen (celular → WhatsApp, etc.)
+      try{ if(navigator.canShare&&navigator.canShare({files:[file]})){ navigator.share({files:[file],title:'Informe de evaluación de compra'}).catch(function(){}); return; } }catch(e){}
+      // 2) Copiar al portapapeles (compu → pegar en WhatsApp/mail)
+      try{ if(navigator.clipboard&&window.ClipboardItem){ navigator.clipboard.write([new ClipboardItem({'image/png':blob})]).then(function(){ alert('Imagen del informe copiada — pegala donde quieras (Ctrl+V).'); }).catch(dl); return; } }catch(e){}
+      // 3) Descargar
+      dl();
+    },'image/png');
   }).catch(function(){ if(document.body.contains(sheet))document.body.removeChild(sheet); alert('No se pudo generar el informe.'); });
 }
 function setMode(m){
@@ -640,7 +655,8 @@ function renderAll(){
       </div>
       ${gaugeSVG(NEG.pag,R.indifMu)}
       <button class="sharebtn" onclick="saveLote()" style="background:var(--accent);margin-top:14px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Guardar lote</button>
-      <button class="sharebtn" onclick="generateReport()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>Generar informe (PDF)</button>
+      <button class="sharebtn" onclick="generateReport('img')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>Compartir informe (imagen)</button>
+      <button class="sharebtn" onclick="generateReport('pdf')" style="background:transparent;border:1px solid var(--line);color:var(--muted)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>Descargar PDF</button>
     </div>`;
   const benchAnual=(PARAMS.tnaFima==null?0.19:PARAMS.tnaFima)*(NEG.mu==null?1:NEG.mu);
   const teaOk=R.tea>=benchAnual;

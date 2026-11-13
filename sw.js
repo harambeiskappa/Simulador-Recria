@@ -1,5 +1,5 @@
 /* Service worker · Simulador de Recría */
-const CACHE = "recria-v17";
+const CACHE = "recria-v18";
 const SHELL = [
   "./index.html",
   "./manifest.json",

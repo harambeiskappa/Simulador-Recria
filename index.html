@@ -21,6 +21,7 @@
 
 
 
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
@@ -115,6 +116,8 @@ table{border-collapse:collapse;width:100%;font-size:13px}
 .dt td{padding:7px 4px;border-bottom:1px solid var(--line)}
 .dt td:last-child{text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
 .dt tr.sub td{color:var(--muted);font-size:12px}
+.dt td.tip{cursor:help;text-decoration:underline dotted;text-decoration-color:var(--muted);text-underline-offset:3px;-webkit-text-decoration:underline dotted var(--muted)}
+.dt tr.tot td[title]{cursor:help}
 .dt tr.tot td{font-weight:800;border-top:2px solid var(--line);border-bottom:none;padding-top:10px}
 .dcols{display:grid;grid-template-columns:1fr 1fr;gap:24px}
 .bsum{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:18px}
@@ -262,14 +265,14 @@ html.dark .flag,html.dark .wip-banner{color:var(--ambar)}
 </div>
 </div>
 <script>
-const APP_VER="v2.8";
+const APP_VER="v2.9";
 (function(){try{var t=localStorage.getItem("recriaTheme");if(t==="dark"||(!t&&window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches))document.documentElement.classList.add("dark");}catch(e){}})();
 /* ===== PRECIOS-INICIO (lo actualiza la tarea diaria) ===== */
-const PIZ_FECHA="12/11/2026 · maíz Rosario 10/11 (pizarra BCR) · invernada boletín CACG N°11 (oct-26, Entre Surcos y Corrales) · novillo CACG oct-26";
+const PIZ_FECHA="13/11/2026 · maíz Rosario 11/11 (pizarra BCR) · invernada boletín CACG N°11 (oct-26, Entre Surcos y Corrales) · novillo CACG oct-26";
 const PIZ={
   machos:[[0,8501,9400,7600],[100,7157,8932,4600],[130,6701,8194,5020],[160,6288,8547,4598],[180,6109,7796,5000],[200,5989,7200,4430],[230,5701,6950,3922],[260,5280,6000,3860],[300,5167,6200,4121],[330,5036,5650,3313],[370,4678,5220,4120],[400,4333,5000,3820]],
   hembras:[[0,7156,9778,5440],[100,7089,8186,5159],[130,6142,7037,4930],[150,5847,7325,4808],[170,5635,6800,4301],[190,5608,6927,4500],[210,5386,6842,4000],[250,4985,6654,4138],[290,4724,6161,3750],[320,4661,5460,3465]],
-  rosgan:4900, novillo:4307, maiz:274300
+  rosgan:4900, novillo:4307, maiz:275000
 };
 /* ===== PRECIOS-FIN ===== */
 /* ===== MIS LOTES (guardados en el dispositivo) ===== */
@@ -716,20 +719,20 @@ function curveSVG(tbl,ent,exit){
   <div style="display:flex;justify-content:space-between;font-size:10.5px;color:var(--muted);margin-top:4px"><span>precio $/kg de invernada según peso</span><span>el $/kg baja al engordar</span></div>`;
 }
 function renderDetalle(R){
-  const L=(t,v,sub)=>`<tr class="${sub?'sub':''}"><td>${t}</td><td class="num">${v}</td></tr>`;
+  const L=(t,v,sub,tip)=>`<tr class="${sub?'sub':''}"><td${tip?` class="tip" title="${tip}"`:""}>${t}</td><td class="num">${v}</td></tr>`;
   const c1=`<table class="dt"><tr class="sub"><td colspan="2"><b>PRODUCCIÓN</b></td></tr>
-    ${L("Días en engorde",Math.round(R.dias)+" d · "+R.ciclos.toFixed(2)+" ciclos/año")}${L("Aumento diario (ADP)",f1(PARAMS.aum)+" kg/día",1)}${L("Peso de salida efectivo",f1(R.salef)+" kg")}${L("Kg a producir",f1(R.kgp)+" kg")}${L("Consumo ración",f1(R.consTCdia)+" kg/día · "+f0(R.totalTC)+" kg total",1)}
-    <tr class="sub"><td colspan="2"><b>COSTOS DE PRODUCCIÓN</b></td></tr>${PARAMS.modoCampo==="Capitalización"?L("Costo capitalización",f0(R.atot)+" ("+(PARAMS.pctCapt*100).toFixed(0)+"% kg × precio)",1):L("Costo de campo (por ha)",f0(R.atot),1)+L("· Implem. verdeos",f0(R.verdImpl)+" $/ha ("+PARAMS.sieMet+")",1)}${L("Suplementación",f0(R.stot),1)}${L("· Costo dieta",f0(R.costoDietaTon)+" $/tnTC · "+R.msDieta.toFixed(1)+"% MS",1)}${L("Hotelería / manejo",f0(R.hot),1)}${L("Sanidad",f0(PARAMS.san),1)}${L("Total costos producción",f0(R.cp))}
-    <tr class="sub"><td colspan="2"><b>COMPRA</b></td></tr>${L("Flete ingreso",f1(R.flei)+" $/kg",1)}${L("Compra neta $/kg",f1(R.cnkg))}${L("Compra neta importe",f0p(-R.cn))}
-    <tr class="sub"><td colspan="2"><b>VENTA / SALIDA</b></td></tr>${L("Precio venta bruto",f1(R.psal)+" $/kg vivo",1)}${L("Flete venta",f1(R.fles)+" $/kg",1)}${L("Gastos de venta",f1(R.gv)+" $/kg",1)}${L("Venta neta importe",f0(R.vn))}${L("· Merma mortandad+desbaste (en venta)",f0p(-(R.mort)),1)}</table>`;
+    ${L("Días en engorde",Math.round(R.dias)+" d · "+R.ciclos.toFixed(2)+" ciclos/año",0,"Cuántos días está el animal en el campo (kilos a producir ÷ aumento diario). Define el costo de campo y el financiero.")}${L("Aumento diario (ADP)",f1(PARAMS.aum)+" kg/día",1,"Kilos que gana por día. Cuanto más alto, menos días en el campo y menos costo por cabeza.")}${L("Peso de salida efectivo",f1(R.salef)+" kg",0,"Peso al que sale el animal. Sobre esto se calcula la venta.")}${L("Kg a producir",f1(R.kgp)+" kg",0,"Kilos que gana en el campo (salida − entrada). Es lo que realmente producís.")}${L("Consumo ración",f1(R.consTCdia)+" kg/día · "+f0(R.totalTC)+" kg total",1,"Kg de ración por día y total del ciclo. Depende del % de suplementación y los días de suministro. En 0 = puro pasto, sin ración.")}
+    <tr class="sub"><td colspan="2"><b>COSTOS DE PRODUCCIÓN</b></td></tr>${PARAMS.modoCampo==="Capitalización"?L("Costo capitalización",f0(R.atot)+" ("+(PARAMS.pctCapt*100).toFixed(0)+"% kg × precio)",1,"En modo capitalización: lo que pagás al dueño del campo = un % de los kilos producidos × su precio."):L("Costo de campo (por ha)",f0(R.atot),1,"Costo del campo por cabeza: verdeos + pasturas + mantenimiento + alquiler (por hectárea), repartido por la carga y los días.")+L("· Implem. verdeos",f0(R.verdImpl)+" $/ha ("+PARAMS.sieMet+")",1,"Parte del costo de campo: sembrar los verdeos (labor + semilla), en dólares × tipo de cambio.")}${L("Suplementación",f0(R.stot),1,"Costo total de la ración dada: kg/día × días de suministro × precio de la dieta. En 0 no hay ración (puro pasto).")}${L("· Costo dieta",f0(R.costoDietaTon)+" $/tnTC · "+R.msDieta.toFixed(1)+"% MS",1,"Precio de la ración de 3 insumos (maíz/silo/núcleo) por tonelada, y su % de materia seca.")}${L("Hotelería / manejo",f0(R.hot),1,"Costo diario de hotelería/manejo × días. En recría a campo suele ser 0 (es de feedlot).")}${L("Sanidad",f0(PARAMS.san),1,"Plan sanitario por cabeza: vacunas, antiparasitarios, etc.")}${L("Total costos producción",f0(R.cp),0,"Suma de todo lo que cuesta tenerlo en el campo: campo + ración + hotelería + sanidad.")}
+    <tr class="sub"><td colspan="2"><b>COMPRA</b></td></tr>${L("Flete ingreso",f1(R.flei)+" $/kg",1,"Costo del flete para traer el animal al campo, por kilo.")}${L("Compra neta $/kg",f1(R.cnkg),0,"Lo que realmente te cuesta el kilo comprado: precio pagado + comisión de compra + flete.")}${L("Compra neta importe",f0p(-R.cn),0,"Costo total de la compra por cabeza (compra neta × kilos de entrada).")}
+    <tr class="sub"><td colspan="2"><b>VENTA / SALIDA</b></td></tr>${L("Precio venta bruto",f1(R.psal)+" $/kg vivo",1,"Precio de salida del animal según el destino (pizarra por peso, carne × rinde, o manual).")}${L("Flete venta",f1(R.fles)+" $/kg",1,"Costo del flete de salida, por kilo. 0 si es transferencia interna al feedlot.")}${L("Gastos de venta",f1(R.gv)+" $/kg",1,"Comisión de venta + guías + flete, por kilo. 0 en transferencia interna (no se comercializa).")}${L("Venta neta importe",f0(R.vn),0,"Lo que entra por la venta: precio neto × kilos vendidos (ya con merma descontada).")}${L("· Merma mortandad+desbaste (en venta)",f0p(-(R.mort)),1,"Plata que se pierde por mortandad y desbaste, descontada de la venta.")}</table>`;
   const c2=`<table class="dt"><tr class="sub"><td colspan="2"><b>ANÁLISIS FINANCIERO</b></td></tr>
-    ${L("Días financiamiento",Math.round(R.diasf)+" d",1)}${L("Costo financiero",f0p(-R.fin),1)}${L("Capital empleado",f0(R.cn+R.cp),1)}${L("Tasa recría (FIMA×µ · ciclo)",fp(R.rmu),1)}${L("Objetivo recupero/cab",f0p(R.objMu),1)}${L("Retorno sobre inversión",fp(R.rt))}${L("TIR anual equivalente",fp(R.tea))}
-    <tr class="sub"><td colspan="2"><b>IMPUESTOS</b></td></tr>${L("Retención ganancias",f0(R.retg),1)}${L("IVA posición",f0p(R.ivap),1)}
-    <tr class="sub"><td colspan="2"><b>PUNTOS DE EQUILIBRIO (INDIFERENCIA)</b></td></tr>${L("Precio venta indif. (vivo)",f0(R.ventaInd)+" $/kg",1)}${L("Precio compra indif. (vivo)",f0(R.indif)+" $/kg",1)}${L("Precio ración indif.",f0(R.racionInd)+" $/kgTC",1)}${L("Indif. recupero capital (µ)",f0(R.indifMu)+" $/kg",1)}
-    <tr class="sub"><td colspan="2"><b>RESULTADO</b></td></tr>${L("Resultado comercial",f0p(R.rescom),1)}${L("Resultado producción",f0p(R.resprod),1)}
-    <tr class="tot"><td>RESULTADO ECONÓMICO</td><td class="num" style="color:${R.res>=0?'var(--verde)':'var(--rojo)'}">${f0p(R.res)}</td></tr>
-    <tr class="sub"><td colspan="2"><b>CONSOLIDADO DEL GRUPO (GANADERÍA + CONSIGNATARIA PROPIA)</b></td></tr>${L("Resultado ganadería",f0p(R.res),1)}${L("+ Comisión de compra (consignataria propia)",f0p(R.hpComCompra),1)}${L("+ Comisión de venta (consignataria propia)",f0p(R.hpComVenta),1)}${L("+ Margen alimentación (markup dieta)",f0p(R.hpDieta),1)}${L("+ Margen fletes propios (20%)",f0p(R.hpFletes),1)}${R.pctPropia<1?L("· parte que queda en el grupo",(R.pctPropia*100).toFixed(0)+"% → "+f0p(R.hpAplicado),1):""}
-    <tr class="tot"><td>RESULTADO CONSOLIDADO</td><td class="num" style="color:var(--accent)">${f0p(R.resConsol)}</td></tr></table>`;
+    ${L("Días financiamiento",Math.round(R.diasf)+" d",1,"Días que tenés la plata inmovilizada: el ciclo más los plazos de pago de compra y venta.")}${L("Costo financiero",f0p(-R.fin),1,"Lo que cuesta tener el capital inmovilizado ese tiempo, a la tasa anual (TNA).")}${L("Capital empleado",f0(R.cn+R.cp),1,"Plata total puesta en el negocio: compra + costos de producción.")}${L("Tasa recría (FIMA×µ · ciclo)",fp(R.rmu),1,"Tasa objetivo del ciclo = plazo fijo × µ. El rendimiento mínimo que le exigís al capital.")}${L("Objetivo recupero/cab",f0p(R.objMu),1,"Lo que buscás ganar por cabeza para que el capital rinda como el plazo fijo × µ.")}${L("Retorno sobre inversión",fp(R.rt),0,"Resultado ÷ capital empleado. Cuánto rinde la plata en el ciclo.")}${L("TIR anual equivalente",fp(R.tea),0,"Ese retorno llevado a un año (anualizado), para comparar con el plazo fijo.")}
+    <tr class="sub"><td colspan="2"><b>IMPUESTOS</b></td></tr>${L("Retención ganancias",f0(R.retg),1,"Retención de ganancias a cuenta (RG 830) por la operación. Es un pago a cuenta, no un costo definitivo.")}${L("IVA posición",f0p(R.ivap),1,"Saldo de IVA del ciclo (a pagar o a favor). Informativo, no entra en el resultado.")}
+    <tr class="sub"><td colspan="2"><b>PUNTOS DE EQUILIBRIO (INDIFERENCIA)</b></td></tr>${L("Precio venta indif. (vivo)",f0(R.ventaInd)+" $/kg",1,"A qué precio tendrías que vender para que el resultado sea 0, dado lo que pagaste.")}${L("Precio compra indif. (vivo)",f0(R.indif)+" $/kg",1,"El máximo a pagar para no perder (resultado = 0). Es el punto de equilibrio.")}${L("Precio ración indif.",f0(R.racionInd)+" $/kgTC",1,"Hasta cuánto podría costar la ración antes de que el resultado llegue a 0.")}${L("Indif. recupero capital (µ)",f0(R.indifMu)+" $/kg",1,"El máximo a pagar para que además recupere el capital al plazo fijo × µ. Es la indiferencia principal del semáforo.")}
+    <tr class="sub"><td colspan="2"><b>RESULTADO</b></td></tr>${L("Resultado comercial",f0p(R.rescom),1,"La parte del resultado que viene del spread de compra-venta (el precio del kilo), separada del engorde.")}${L("Resultado producción",f0p(R.resprod),1,"La parte del resultado que viene de producir kilos (el engorde en sí).")}
+    <tr class="tot"><td title="Resultado de la hacienda por cabeza: venta − compra − costos. Es el número del semáforo.">RESULTADO ECONÓMICO</td><td class="num" style="color:${R.res>=0?'var(--verde)':'var(--rojo)'}">${f0p(R.res)}</td></tr>
+    <tr class="sub"><td colspan="2"><b>CONSOLIDADO DEL GRUPO (GANADERÍA + CONSIGNATARIA PROPIA)</b></td></tr>${L("Resultado ganadería",f0p(R.res),1,"El resultado de la hacienda (lo mismo que el resultado económico de arriba).")}${L("+ Comisión de compra (consignataria propia)",f0p(R.hpComCompra),1,"La comisión de compra que, si la consignataria es del grupo (Darwash/Bulltrade), queda en casa en vez de pagarse afuera.")}${L("+ Comisión de venta (consignataria propia)",f0p(R.hpComVenta),1,"Ídem con la comisión de venta: queda en el grupo si vende la consignataria propia.")}${L("+ Margen alimentación (markup dieta)",f0p(R.hpDieta),1,"El markup de la dieta, que es ganancia de quien provee la ración dentro del grupo.")}${L("+ Margen fletes propios (20%)",f0p(R.hpFletes),1,"Margen de los fletes si los hace el grupo (20% del costo de flete).")}${R.pctPropia<1?L("· parte que queda en el grupo",(R.pctPropia*100).toFixed(0)+"% → "+f0p(R.hpAplicado),1,"Qué parte de esos márgenes queda en el grupo, según el % de hacienda propia que cargaste."):""}
+    <tr class="tot"><td title="Resultado total del grupo: la ganadería + las comisiones y márgenes que quedan en casa.">RESULTADO CONSOLIDADO</td><td class="num" style="color:var(--accent)">${f0p(R.resConsol)}</td></tr></table>`;
   document.getElementById("detalle").innerHTML=`<div>${c1}</div><div>${c2}</div>`;
 }
 let BTFILTER="all", BTFERIA="all", kpiOpen=false;

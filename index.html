@@ -266,7 +266,7 @@ html.dark .flag,html.dark .wip-banner{color:var(--ambar)}
 </div>
 </div>
 <script>
-const APP_VER="v3.1";
+const APP_VER="v3.2";
 (function(){try{var t=localStorage.getItem("recriaTheme");if(t==="dark"||(!t&&window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches))document.documentElement.classList.add("dark");}catch(e){}})();
 /* ===== PRECIOS-INICIO (lo actualiza la tarea diaria) ===== */
 const PIZ_FECHA="13/11/2026 · maíz Rosario 11/11 (pizarra BCR) · invernada boletín CACG N°11 (oct-26, Entre Surcos y Corrales) · novillo CACG oct-26";
@@ -461,7 +461,7 @@ function shareResult(){
   L.push(NEG.categ+" · "+Math.round(NEG.ent)+" → "+Math.round(R.salef)+" kg · "+dest);
   L.push("Pagado: "+f0(NEG.pag)+" $/kg");
   L.push("Indiferencia (µ="+(NEG.mu==null?1:NEG.mu)+"): "+f0(R.indifMu)+" $/kg");
-  L.push({verde:"✓ BUENA COMPRA — rinde lo pedido (plazo fijo ×µ)",rojo:"✗ MALA COMPRA — por encima de la indiferencia (µ)"}[niv]);
+  L.push({verde:"✓ DENTRO DE LA INDIFERENCIA — rinde lo pedido (plazo fijo ×µ)",rojo:"✗ POR ENCIMA DE LA INDIFERENCIA (µ)"}[niv]);
   L.push("TEA "+fp(R.tea)+" vs plazo fijo×µ "+fp(benchAnual));
   L.push("— Simulador de Recría · Grupo PEGSA & BULL");
   const txt=L.join("\n");
@@ -475,8 +475,8 @@ function generateReport(mode){
   if(mode==='pdf'&&!(window.jspdf&&window.jspdf.jsPDF)){ alert('El generador de PDF esta cargando. Proba de nuevo en un instante.'); return; }
   const R=calc(NEG,PARAMS); const dif=R.indif-NEG.pag;
   const niv = NEG.pag<=R.indifMu ? 'verde' : 'rojo';
-  const rep={verde:{bg:'#e7f4ec',bd:'#bfe3cd',col:'#1f8a4c',ti:'VERDE — Buena compra',tx:'Se pago por debajo de la indiferencia (µ): cierra y rinde lo pedido (plazo fijo × µ).'},
-    rojo:{bg:'#fbeae8',bd:'#f0c9c4',col:'#c0392b',ti:'ROJO — Mala compra',tx:'Se pago por encima de la indiferencia (µ): no rinde lo buscado. Con µ=0, la indiferencia es el punto de equilibrio.'}}[niv];
+  const rep={verde:{bg:'#e7f4ec',bd:'#bfe3cd',col:'#1f8a4c',ti:'VERDE — Dentro de la indiferencia',tx:'Se pago por debajo de la indiferencia (µ): cierra y rinde lo pedido (plazo fijo × µ).'},
+    rojo:{bg:'#fbeae8',bd:'#f0c9c4',col:'#c0392b',ti:'ROJO — Por encima de la indiferencia',tx:'Se pago por encima de la indiferencia (µ): no rinde lo buscado. Con µ=0, la indiferencia es el punto de equilibrio.'}}[niv];
   const benchAnual=(PARAMS.tnaFima==null?0.19:PARAMS.tnaFima)*(NEG.mu==null?1:NEG.mu);
   const dest={INVERNADA:'Invernada',FAENA:'Faena',TRANSFERENCIA:'Transferencia'}[NEG.dest]||NEG.dest;
   const fecha=new Date().toLocaleDateString('es-AR');
@@ -640,8 +640,8 @@ function renderAll(){
   const _va=document.getElementById("ventaAuto"); if(_va)_va.textContent=f0(R.psal);
   const _oa=document.getElementById("objAuto"); if(_oa)_oa.textContent = NEG.objMode==="Monto ($/cab)" ? (R.muImplied.toFixed(2).replace(".",",")+"×") : f0(R.objMu);
   const vcfg={
-    verde:{cls:'ok',tag:'✓ Buena compra',big:'VERDE',desc:'Pagaste por debajo de la indiferencia (µ): cierra y rinde lo que le pedís a la recría (plazo fijo × µ).'},
-    rojo:{cls:'bad',tag:'✗ Mala compra',big:'ROJO',desc:'Pagaste por encima de la indiferencia (µ): no te rinde lo buscado. (Con µ = 0 la indiferencia es el punto de equilibrio / reclamo.)'}
+    verde:{cls:'ok',tag:'✓ Dentro de la indiferencia',big:'VERDE',desc:'Pagaste por debajo de la indiferencia (µ): cierra y rinde lo que le pedís a la recría (plazo fijo × µ).'},
+    rojo:{cls:'bad',tag:'✗ Por encima de la indiferencia',big:'ROJO',desc:'Pagaste por encima de la indiferencia (µ): no te rinde lo buscado. (Con µ = 0 la indiferencia es el punto de equilibrio / reclamo.)'}
   }[niv];
   document.getElementById("resultBox").innerHTML=`
     <div class="result ${vcfg.cls}">
